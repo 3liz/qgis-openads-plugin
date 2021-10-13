@@ -1,3 +1,3 @@
-# qgis-openads-plugin
+# openADS
 
-Plugin QGIS pour préparer les données pour le module Lizmap openADS
+Extension QGIS pour préparer les données pour le module Lizmap openADS

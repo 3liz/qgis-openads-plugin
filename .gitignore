@@ -1,0 +1,28 @@
+# Python
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# Mkdocs
+build/
+docs/CHANGELOG.md
+docs/CONTRIBUTING.md
+
+# OS
+.DS_Store
+
+# IDE
+.idea/
+*.code-workspace
+
+# Plugins, QGIS-plugin-CI
+openads.*.zip
+plugins.xml
+
+# Temp files
+*~
+*.bak
+*.gpkg-wal
+*.gpkg-shm
+.~lock.*
