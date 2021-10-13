@@ -13,7 +13,6 @@ __email__ = "info@3liz.org"
 
 
 class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
-
     def createInstance(self):
         return type(self)()
 
@@ -21,7 +20,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         return super().flags() | QgsProcessingAlgorithm.FlagHideFromModeler
 
     def icon(self) -> QIcon:
-        icon = resources_path('icons', 'icon.png')
+        icon = resources_path("icons", "icon.png")
         if icon.exists():
             return QIcon(str(icon))
         else:
@@ -29,11 +28,11 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
 
     def parameters_help_string(self) -> str:
         """ Return a formatted help string for all parameters. """
-        help_string = ''
+        help_string = ""
         for param in self.parameterDefinitions():
             info = param.help()
             if info:
-                help_string += '{} : {}\n\n'.format(param.name(), info)
+                help_string += "{} : {}\n\n".format(param.name(), info)
 
         return help_string
 

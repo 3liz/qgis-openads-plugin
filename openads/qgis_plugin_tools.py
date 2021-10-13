@@ -4,8 +4,6 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-import os  # TO BE REMOVED
-
 from pathlib import Path
 
 from qgis.PyQt import uic
@@ -22,12 +20,12 @@ def plugin_path(*args) -> Path:
 
 def resources_path(*args) -> Path:
     """ Return the path to the plugin resources folder. """
-    return plugin_path('resources', *args)
+    return plugin_path("resources", *args)
 
 
 def plugin_test_data_path(*args) -> Path:
     """ Return the path to the plugin test data folder. """
-    return plugin_path('tests', 'fixtures', *args)
+    return plugin_path("tests", "fixtures", *args)
 
 
 def load_ui(*args):
@@ -36,30 +34,33 @@ def load_ui(*args):
     return ui_class
 
 
-def available_migrations(minimum_version: int):
+def available_migrations(minimum_version: int) -> list[str]:
     """Get all the upgrade SQL files since the provided version."""
     upgrade_dir = plugin_path("install", "sql", "upgrade")
-    get_files = [
-        f for f in os.listdir(upgrade_dir) if os.path.isfile(os.path.join(upgrade_dir, f))
-    ]
     files = []
 
-    for sql_file in get_files:
-        if not sql_file.endswith('.sql'):
+    for sql_file in upgrade_dir.iterdir():
+        if not sql_file.is_file():
             continue
-        current_version = format_version_integer(
-            sql_file.replace("upgrade_to_", "").replace(".sql", "").strip())
-        if current_version > minimum_version:
-            files.append([current_version, sql_file])
 
-    def getKey(item):
+        if not sql_file.suffix == ".sql":
+            continue
+
+        current_version = format_version_integer(
+            sql_file.name.replace("upgrade_to_", "").replace(".sql", "").strip()
+        )
+
+        if current_version > minimum_version:
+            files.append([current_version, sql_file.name])
+
+    def get_key(item):
         return item[0]
 
-    sql_files = sorted(files, key=getKey)
+    sql_files = sorted(files, key=get_key)
     return [s[1] for s in sql_files]
 
 
-def format_version_integer(version_string: str):
+def format_version_integer(version_string: str) -> int:
     """Transform version string to integers to allow comparing versions.
 
     Transform "0.1.2" into "000102"

@@ -13,4 +13,5 @@ def classFactory(iface):  # pylint: disable=invalid-name
     _ = iface
     # pylint: disable=import-outside-toplevel
     from openads.plugin import OpenAdsPlugin
+
     return OpenAdsPlugin()
