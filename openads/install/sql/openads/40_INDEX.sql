@@ -23,6 +23,29 @@ SET default_tablespace = '';
 CREATE INDEX qgis_plugin_id_idx ON openads.qgis_plugin USING btree (id);
 
 
+-- geo_contraintes_id_contraintes_idx
+CREATE INDEX geo_contraintes_id_contraintes_idx ON openads.geo_contraintes USING btree (id_contraintes);
+
+
+-- communes_index_geom_gist
+CREATE INDEX communes_index_geom_gist ON openads.communes USING gist (geom);
+
+
+-- contraintes_geo_index_geom_gist
+CREATE INDEX geo_contraintes_index_geom_gist ON openads.geo_contraintes USING gist (geom);
+
+
+-- dossiers_openads_index_geom_gist
+CREATE INDEX dossiers_openads_index_geom_gist ON openads.dossiers_openads USING gist (geom);
+
+
+-- dossiers_sig_index_geom_gist
+CREATE INDEX dossiers_sig_index_geom_gist ON openads.dossiers_sig USING gist (geom);
+
+
+-- parcelles_index_geom_gist
+CREATE INDEX parcelles_index_geom_gist ON openads.parcelles USING gist (geom);
+
 --
 -- PostgreSQL database dump complete
 --
