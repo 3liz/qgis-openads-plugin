@@ -53,6 +53,25 @@ ALTER TABLE ONLY openads.parcelles
 ALTER TABLE ONLY openads.contraintes_geo
     ADD CONSTRAINT contraintes_geo_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes);
 
+-- communes communes_codeinsee_unique
+ALTER TABLE ONLY openads.communes
+    ADD CONSTRAINT communes_codeinsee_unique UNIQUE (codeinsee);
+
+
+-- parcelles parcelles_ident_unique
+ALTER TABLE ONLY openads.parcelles
+    ADD CONSTRAINT parcelles_ident_unique UNIQUE (ident);
+
+
+-- parcelles dossiers_sig_numero_unique
+ALTER TABLE ONLY openads.dossiers_sig
+    ADD CONSTRAINT dossiers_sig_numero_unique UNIQUE (numero);
+
+
+-- parcelles dossiers_openads_numero_unique
+ALTER TABLE ONLY openads.dossiers_openads
+    ADD CONSTRAINT dossiers_openads_numero_unique UNIQUE (numero);
+
 
 --
 -- PostgreSQL database dump complete
