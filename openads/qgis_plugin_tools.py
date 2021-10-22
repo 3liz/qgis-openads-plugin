@@ -5,6 +5,7 @@ __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
 from pathlib import Path
+from typing import List
 
 from qgis.PyQt import uic
 
@@ -34,7 +35,7 @@ def load_ui(*args):
     return ui_class
 
 
-def available_migrations(minimum_version: int) -> list[str]:
+def available_migrations(minimum_version: int) -> List[str]:
     """Get all the upgrade SQL files since the provided version."""
     upgrade_dir = plugin_path("install", "sql", "upgrade")
     files = []
