@@ -6,6 +6,8 @@ from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
 from openads.processing.database.create import CreateDatabaseStructure
+from openads.processing.data.import_communes import ImportCommunesAlg
+from openads.processing.data.import_parcelles import ImportParcellesAlg
 from openads.qgis_plugin_tools import resources_path
 
 # from openads.processing.database.upgrade import UpgradeDatabaseStructure
@@ -14,6 +16,8 @@ from openads.qgis_plugin_tools import resources_path
 class OpenAdsProvider(QgsProcessingProvider):
     def loadAlgorithms(self):
         self.addAlgorithm(CreateDatabaseStructure())
+        self.addAlgorithm(ImportCommunesAlg())
+        self.addAlgorithm(ImportParcellesAlg())
         # self.addAlgorithm(UpgradeDatabaseStructure())
 
     def id(self):  # NOQA: A003
