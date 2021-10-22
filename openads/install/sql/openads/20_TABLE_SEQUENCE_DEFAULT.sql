@@ -201,7 +201,7 @@ ALTER TABLE ONLY openads.communes ALTER COLUMN id_communes SET DEFAULT nextval('
 
 
 -- contraintes id_contraites
-ALTER TABLE ONLY openads.contraintes ALTER COLUMN id_contraintes SET DEFAULT nextval('openads.contraintes_id_contraites_seq'::regclass);
+ALTER TABLE ONLY openads.contraintes ALTER COLUMN id_contraintes SET DEFAULT nextval('openads.contraintes_id_contraintes_seq'::regclass);
 
 
 -- geo_contraintes id_geo_contraintes
