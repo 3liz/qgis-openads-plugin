@@ -24,9 +24,9 @@ ALTER TABLE ONLY openads.communes
     ADD CONSTRAINT communes_pkey PRIMARY KEY (id_communes);
 
 
--- contraintes_geo contraintes_geo_pkey
-ALTER TABLE ONLY openads.contraintes_geo
-    ADD CONSTRAINT contraintes_geo_pkey PRIMARY KEY (id_contraintes_geo);
+-- geo_contraintes geo_contraintes_pkey
+ALTER TABLE ONLY openads.geo_contraintes
+    ADD CONSTRAINT geo_contraintes_pkey PRIMARY KEY (id_geo_contraintes);
 
 
 -- contraintes contraintes_pkey
@@ -49,9 +49,9 @@ ALTER TABLE ONLY openads.parcelles
     ADD CONSTRAINT parcelles_pkey PRIMARY KEY (id_parcelles);
 
 
--- contraintes_geo contraintes_geo_fkey
-ALTER TABLE ONLY openads.contraintes_geo
-    ADD CONSTRAINT contraintes_geo_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes);
+-- geo_contraintes geo_contraintes_fkey
+ALTER TABLE ONLY openads.geo_contraintes
+    ADD CONSTRAINT geo_contraintes_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes);
 
 -- communes communes_codeinsee_unique
 ALTER TABLE ONLY openads.communes

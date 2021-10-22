@@ -61,7 +61,7 @@ CREATE TABLE openads.contraintes (
 );
 
 
--- contraintes_geo
+-- geo_contraintes
 CREATE TABLE openads.geo_contraintes (
     id_geo_contraintes integer NOT NULL,
     id_contraintes integer,
