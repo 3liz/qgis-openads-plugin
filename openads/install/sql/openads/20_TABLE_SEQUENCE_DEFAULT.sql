@@ -63,7 +63,7 @@ CREATE TABLE openads.contraintes (
 
 -- contraintes_geo
 CREATE TABLE openads.geo_contraintes (
-    id_contraintes_geo integer NOT NULL,
+    id_geo_contraintes integer NOT NULL,
     id_contraintes integer,
     texte text,
     codeinsee character(5),
