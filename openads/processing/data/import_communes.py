@@ -109,7 +109,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie")
         )
 
-    def init_layer(self, context: QgsProcessingContext, uri: str, schema: str, table: str, geom: str, sql: str, pk: str=None):
+    def init_layer(self, context: QgsProcessingContext, uri: str, schema: str, table: str, geom: str, sql: str, pk: str=None) -> QgsVectorLayer:
         """Create vector layer from database table"""
         if pk:
             uri.setDataSource(schema, table, geom, sql, pk)
