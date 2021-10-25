@@ -1,0 +1,49 @@
+variables:
+  CUSTOMER: "atreal"
+  PLUGIN_NAME: "openads"
+  PROJECT_ID: "418"
+
+stages:
+- Tests 🎳
+- Package 📦
+- Release 🚀
+
+QGIS-3.16-PostGIS-2.5:
+  stage: Tests 🎳
+  image:
+    name: registry.snap.lizlan:5000/qgis/qgis:release-3_16
+  services:
+    - name: registry.snap.lizlan:5000/postgis:11-2.5
+      alias: db
+  script:
+    - mkdir /tests_directory/
+    - ln -s ${CI_PROJECT_DIR}/${PLUGIN_NAME} /tests_directory
+    - qgis_setup.sh ${PLUGIN_NAME}
+    # Patch the script because it uses an invalid redirection to non-existent /dev/tty
+    # Run xvfb if necessary
+    - nohup /usr/bin/Xvfb $DISPLAY -screen 0 1024x768x24 -ac +extension GLX +render -noreset -nolisten tcp &
+    - ./.docker/qgis_testrunner.sh ${PLUGIN_NAME}.tests.runner.test_package
+  variables:
+     DISPLAY: ':99'
+  tags:
+    - factory-plain
+
+QGIS-3.20-PostGIS-3:
+  stage: Tests 🎳
+  image:
+    name: registry.snap.lizlan:5000/qgis/qgis:release-3_20
+  services:
+    - name: registry.snap.lizlan:5000/postgis:11-13-3
+      alias: db
+  script:
+    - mkdir /tests_directory/
+    - ln -s ${CI_PROJECT_DIR}/${PLUGIN_NAME} /tests_directory
+    - qgis_setup.sh ${PLUGIN_NAME}
+    # Patch the script because it uses an invalid redirection to non-existent /dev/tty
+    # Run xvfb if necessary
+    - nohup /usr/bin/Xvfb $DISPLAY -screen 0 1024x768x24 -ac +extension GLX +render -noreset -nolisten tcp &
+    - ./.docker/qgis_testrunner.sh ${PLUGIN_NAME}.tests.runner.test_package
+  variables:
+     DISPLAY: ':99'
+  tags:
+    - factory-plain

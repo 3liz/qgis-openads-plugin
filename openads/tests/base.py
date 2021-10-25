@@ -15,13 +15,14 @@ class TestCasePlugin(TestCase):
     def setUpClass(cls):
         from qgis.utils import iface
 
-        print(iface)
-        cls.qgs = QgsApplication([], False)
-        cls.qgs.initQgis()
-        from qgis.utils import iface
-
-        print(iface)
+        if not iface:
+            print("Init QGIS application")
+            cls.qgs = QgsApplication([], False)
+            cls.qgs.initQgis()
+        else:
+            cls.qgs = None
 
     @classmethod
     def tearDownClass(cls):
-        cls.qgs.exitQgis()
+        if cls.qgs:
+            cls.qgs.exitQgis()
