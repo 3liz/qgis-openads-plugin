@@ -8,22 +8,35 @@ run_tests:
 
 stop_tests:
 	@echo 'Stopping/killing containers'
-	@cd .docker && docker-compose -f docker-compose-qgis.yml kill
-	@cd .docker && docker-compose -f docker-compose-qgis.yml rm -f
+	@cd .docker && ./stop.sh
 
 tests: start_tests run_tests stop_tests
 
-schemaspy:
-	@echo 'Need to write it'
-
 test_migration:
-	@echo 'Need to write it'
+	@echo 'Testing migrations'
+	@cd .docker && ./start.sh
+	@cd .docker && ./install_migrate_generate.sh
+	@cd .docker && ./stop.sh
+
+schemaspy:
+	@echo 'Generating schemaspy documentation'
+	@cd .docker && ./start.sh
+	rm -rf docs/database
+	mkdir docs/database
+	@cd .docker && ./install_db.sh
+	@cd .docker && ./schemaspy.sh
+	@cd .docker && docker-compose kill
+	@cd .docker && docker-compose rm -rf
 
 processing-doc:
 	@echo 'Need to write it'
 
 reformat_sql:
-	@echo 'Need to write it'
+	@echo 'Reformat SQL'
+	@cd .docker && ./start.sh
+	@cd .docker && ./install_db.sh
+	@cd .docker && ./reformat_sql_install.sh
+	@cd .docker && ./stop.sh
 
 generate_sql:
 	@echo 'Generate SQL into install files from service openads'

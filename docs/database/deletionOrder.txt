@@ -1,7 +1,7 @@
 qgis_plugin
 parcelles
-geo_contraintes
 dossiers_sig
 dossiers_openads
-contraintes
 communes
+geo_contraintes
+contraintes

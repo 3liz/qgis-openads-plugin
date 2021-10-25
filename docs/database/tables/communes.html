@@ -116,7 +116,7 @@
                                 </thead>
                                 <tbody>
                                 <tr>
-                                    <td><span id="id_communes">id_communes</span></td>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey' style='padding-left: 5px;'></i><span id="id_communes">id_communes</span></td>
                                     <td>serial</td>
                                     <td>10</td>
                                     <td title=''></td>
@@ -201,7 +201,7 @@
                                     <td></td>
                                 </tr>
                                 <tr>
-                                    <td><span id="codeinsee">codeinsee</span></td>
+                                    <td class='indexedColumn' title='Indexed'><i class='fa fa-sitemap fa-rotate-120' style='padding-right: 5px;'></i><span id="codeinsee">codeinsee</span></td>
                                     <td>bpchar</td>
                                     <td>5</td>
                                     <td title='nullable'>√</td>
@@ -326,6 +326,18 @@
                                 </tr>
                                 </thead>
                                 <tbody>
+                                <tr>
+                                    <td class='primaryKey' title='Primary Key'><i class='icon ion-key iconkey'></i> communes_pkey</td>
+                                    <td>Primary key</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>id_communes</td>
+                                </tr>
+                                <tr>
+                                    <td class='uniqueKey' title='Unique Key'><i class='icon ion-key iconkey'></i> communes_codeinsee_unique</td>
+                                    <td>Must be unique</td>
+                                    <td><span title='Ascending'>Asc</span></td>
+                                    <td>codeinsee</td>
+                                </tr>
                                 <tr>
                                     <td title='Indexed'>communes_index_geom_gist</td>
                                     <td>Performance</td>
