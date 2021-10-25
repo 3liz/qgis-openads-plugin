@@ -2,6 +2,10 @@ variables:
   CUSTOMER: "atreal"
   PLUGIN_NAME: "openads"
   PROJECT_ID: "418"
+  POSTGRES_DB: "gis"
+  POSTGRES_USER: "docker"
+  POSTGRES_PASSWORD: "docker"
+  POSTGRES_HOST: "db"
 
 stages:
 - Tests 🎳
@@ -19,6 +23,7 @@ QGIS-3.16-PostGIS-2.5:
     - mkdir /tests_directory/
     - ln -s ${CI_PROJECT_DIR}/${PLUGIN_NAME} /tests_directory
     - qgis_setup.sh ${PLUGIN_NAME}
+    - cat .docker/postgis_connexions.ini >> /root/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini
     # Patch the script because it uses an invalid redirection to non-existent /dev/tty
     # Run xvfb if necessary
     - nohup /usr/bin/Xvfb $DISPLAY -screen 0 1024x768x24 -ac +extension GLX +render -noreset -nolisten tcp &
@@ -28,17 +33,18 @@ QGIS-3.16-PostGIS-2.5:
   tags:
     - factory-plain
 
-QGIS-3.20-PostGIS-3:
+QGIS-Latest-PostGIS-3.0:
   stage: Tests 🎳
   image:
-    name: registry.snap.lizlan:5000/qgis/qgis:release-3_20
+    name: registry.snap.lizlan:5000/qgis/qgis:latest
   services:
-    - name: registry.snap.lizlan:5000/postgis:11-13-3
+    - name: registry.snap.lizlan:5000/postgis:13-3
       alias: db
   script:
     - mkdir /tests_directory/
     - ln -s ${CI_PROJECT_DIR}/${PLUGIN_NAME} /tests_directory
     - qgis_setup.sh ${PLUGIN_NAME}
+    - cat .docker/postgis_connexions.ini >> /root/.local/share/QGIS/QGIS3/profiles/default/QGIS/QGIS3.ini
     # Patch the script because it uses an invalid redirection to non-existent /dev/tty
     # Run xvfb if necessary
     - nohup /usr/bin/Xvfb $DISPLAY -screen 0 1024x768x24 -ac +extension GLX +render -noreset -nolisten tcp &

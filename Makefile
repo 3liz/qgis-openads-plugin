@@ -25,8 +25,7 @@ schemaspy:
 	mkdir docs/database
 	@cd .docker && ./install_db.sh
 	@cd .docker && ./schemaspy.sh
-	@cd .docker && docker-compose kill
-	@cd .docker && docker-compose rm -rf
+	@cd .docker && ./stop.sh
 
 processing-doc:
 	@echo 'Need to write it'

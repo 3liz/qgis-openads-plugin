@@ -8,20 +8,18 @@ services:
     profiles:
       - "qgis"
       - "db"
-    image: kartoza/postgis:10.0-2.4  # Despite the tag, it's a 10.6 version
+    image: 3liz/postgis:13-3
     hostname: db
     container_name: postgis
     networks:
       qgis_plugin_network:
     environment:
-      - POSTGRES_USER=docker
-      - POSTGRES_PASS=docker
-      - POSTGRES_DBNAME=gis
-      # Uncomment to expose the postgis database on the network
-      # - ALLOW_IP_RANGE= 0.0.0.0/0
+      POSTGRES_DB: "gis"
+      POSTGRES_USER: "docker"
+      POSTGRES_PASSWORD: "docker"
+      POSTGRES_HOST: "db"
     volumes:
       - ../${PLUGIN_NAME}:/tests_directory/${PLUGIN_NAME}
-    # Uncomment to use the postgis database from outside the docker network
     ports:
       - "35432:5432"
     healthcheck:
@@ -35,8 +33,8 @@ services:
     networks:
       qgis_plugin_network:
     volumes:
-      # - /tmp/.X11-unix:/tmp/.X11-unix
+      - /tmp/.X11-unix:/tmp/.X11-unix
       - ../${PLUGIN_NAME}:/tests_directory/${PLUGIN_NAME}
     environment:
-      # - DISPLAY=unix$DISPLAY
-      - DISPLAY=:99
+      - DISPLAY=unix$DISPLAY
+      # - DISPLAY=:99
