@@ -32,7 +32,7 @@ class BaseDatabaseAlgorithm(BaseProcessingAlgorithm):
                 # We can't vacuum a view
                 continue
 
-            sql = "VACUUM ANALYSE {}.{};".format(SCHEMA, table.tableName())
+            sql = f"VACUUM ANALYSE {SCHEMA}.{table.tableName()};"
             feedback.pushDebugInfo(sql)
             try:
                 connection.executeSql(sql)

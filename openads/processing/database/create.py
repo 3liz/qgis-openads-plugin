@@ -69,9 +69,9 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             QgsProcessingParameterBoolean(
                 self.OVERRIDE,
                 (
-                    "Écraser le schéma {} ? ** ATTENTION ** "
+                    f"Écraser le schéma {SCHEMA} ? ** ATTENTION ** "
                     "Cela supprimera toutes les données !"
-                ).format(SCHEMA),
+                ),
                 defaultValue=False,
                 optional=False,
             )
@@ -90,18 +90,16 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection = metadata.findConnection(connection_name)
         if not connection:
-            raise QgsProcessingException(
-                "La connexion {} n'existe pas".format(connection_name)
-            )
+            raise QgsProcessingException(f"La connexion {connection_name} n'existe pas")
 
         if SCHEMA in connection.schemas():
             override = self.parameterAsBool(parameters, self.OVERRIDE, context)
             if not override:
                 msg = (
-                    "Le schéma {} existe déjà dans la base de données {} ! "
+                    f"Le schéma {SCHEMA} existe déjà dans la base de données {connection_name} ! "
                     "Si vous voulez VRAIMENT supprimer et recréer le schéma "
                     "(et supprimer les données) cocher la case **Écraser**"
-                ).format(SCHEMA, connection_name)
+                )
                 return False, msg
 
         return super().checkParameterValues(parameters, context)
@@ -115,7 +113,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         connection = metadata.findConnection(connection_name)
         if not connection:
             raise QgsProcessingException(
-                "La connexion {} n'existe pas.".format(connection_name)
+                f"La connexion {connection_name} n'existe pas."
             )
 
         connection: QgsAbstractDatabaseProviderConnection
@@ -123,7 +121,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         # Drop schema if needed
         override = self.parameterAsBool(parameters, self.OVERRIDE, context)
         if override and SCHEMA in connection.schemas():
-            feedback.pushInfo("Suppression du schéma {}…".format(SCHEMA))
+            feedback.pushInfo(f"Suppression du schéma {SCHEMA}…")
             try:
                 connection.dropSchema(SCHEMA, True)
             except QgsProviderConnectionException as e:
@@ -132,9 +130,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         plugin_dir = plugin_path()
         plugin_version = pluginMetadata(PLUGIN_NAME, "version")
         dev_version = False
-        run_migration = (
-            os.getenv("TEST_DATABASE_INSTALL_{}".format(SCHEMA.upper())) is not None
-        )
+        run_migration = os.getenv(f"TEST_DATABASE_INSTALL_{SCHEMA.upper()}") is not None
         if plugin_version in ("master", "dev") and not run_migration:
             feedback.reportError(
                 "Be careful, running the install on a development branch!"
@@ -144,8 +140,8 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         if run_migration:
             plugin_dir = plugin_test_data_path()
             feedback.reportError(
-                "Be careful, running migrations on an empty database using {} "
-                "instead of {}".format(run_migration, plugin_version)
+                "Be careful, running migrations on an empty database using "
+                f"{run_migration} instead of {plugin_version}"
             )
             plugin_version = run_migration
 
@@ -174,18 +170,18 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         """ Install all SQL files in the given connection. """
         sql_files = (
             "00_initialize_database.sql",
-            "{}/10_FUNCTION.sql".format(SCHEMA),
-            "{}/20_TABLE_SEQUENCE_DEFAULT.sql".format(SCHEMA),
-            "{}/30_VIEW.sql".format(SCHEMA),
-            "{}/40_INDEX.sql".format(SCHEMA),
-            "{}/50_TRIGGER.sql".format(SCHEMA),
-            "{}/60_CONSTRAINT.sql".format(SCHEMA),
-            "{}/70_COMMENT.sql".format(SCHEMA),
+            f"{SCHEMA}/10_FUNCTION.sql",
+            f"{SCHEMA}/20_TABLE_SEQUENCE_DEFAULT.sql",
+            f"{SCHEMA}/30_VIEW.sql",
+            f"{SCHEMA}/40_INDEX.sql",
+            f"{SCHEMA}/50_TRIGGER.sql",
+            f"{SCHEMA}/60_CONSTRAINT.sql",
+            f"{SCHEMA}/70_COMMENT.sql",
             "99_finalize_database.sql",
         )
         for sf in sql_files:
             feedback.pushInfo(sf)
-            sql_file = plugin_dir.joinpath("install/sql/{}".format(sf))
+            sql_file = plugin_dir.joinpath(f"install/sql/{sf}")
             with open(sql_file, "r") as f:
                 sql = f.read()
 
@@ -216,18 +212,14 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             metadata_version = (
                 last_migration.replace("upgrade_to_", "").replace(".sql", "").strip()
             )
-            feedback.reportError("Latest migration is {}".format(metadata_version))
-        sql = """
-            INSERT INTO {}.qgis_plugin
+            feedback.reportError(f"Latest migration is {metadata_version}")
+        sql = f"""
+            INSERT INTO {SCHEMA}.qgis_plugin
             (id, version, version_date, status)
-            VALUES (0, '{}', now()::timestamp(0), 1)""".format(
-            SCHEMA, metadata_version
-        )
+            VALUES (0, '{metadata_version}', now()::timestamp(0), 1)"""
         try:
             connection.executeSql(sql)
         except QgsProviderConnectionException as e:
             raise QgsProcessingException(str(e))
-        feedback.pushInfo(
-            "Version de la base de données '{}'.".format(metadata_version)
-        )
+        feedback.pushInfo(f"Version de la base de données '{metadata_version}'.")
         return metadata_version

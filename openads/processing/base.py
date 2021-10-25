@@ -32,7 +32,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
         for param in self.parameterDefinitions():
             info = param.help()
             if info:
-                help_string += "{} : {}\n\n".format(param.name(), info)
+                help_string += f"{param.name()} : {info}\n\n"
 
         return help_string
 
