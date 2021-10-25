@@ -14,7 +14,6 @@ from qgis.core import (
     QgsExpressionContextUtils,
     QgsProviderConnectionException,
 )
-
 from qgis.core import (
     QgsProcessingParameterDatabaseSchema,
     QgsProcessingParameterProviderConnection,
@@ -25,12 +24,13 @@ from openads.processing.data.base import BaseDataAlgorithm
 
 class ImportCommunesAlg(BaseDataAlgorithm):
     """
-    Import des données Communales depuis le cadastre
+    Import des données Parcellaires depuis le cadastre
     """
 
     CONNECTION_NAME = "CONNECTION_NAME"
-    SCHEMA = "SCHEMA"
-    TRUNCATE_COMMUNES = "TRUNCATE_COMMUNES"
+    SCHEMA_OPENADS = "SCHEMA_OPENADS"
+    SCHEMA_CADASTRE = "SCHEMA_CADASTRE"
+    TRUNCATE_PARCELLES = "TRUNCATE_PARCELLES"
     IMPORT_PROJECT_LAYER = "IMPORT_PROJECT_LAYER"
     OUTPUT = "OUTPUT"
     OUTPUT_MSG = "OUTPUT MSG"
@@ -57,15 +57,27 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             optional=False,
             defaultValue=default
         )
-
         param.setHelp(tooltip)
         self.addParameter(param)
 
-        label = "Schéma"
+        label = "Schéma Cadastre"
         tooltip = 'Nom du schéma des données cadastre'
-        default = 'adresse'
+        default = 'cadastre'
         param = QgsProcessingParameterDatabaseSchema(
-            self.SCHEMA,
+            self.SCHEMA_CADASTRE,
+            label,
+            self.CONNECTION_NAME,
+            defaultValue=default,
+            optional=False,
+        )
+        param.setHelp(tooltip)
+        self.addParameter(param)
+
+        label = "Schéma openADS"
+        tooltip = 'Nom du schéma des données openADS'
+        default = 'openads'
+        param = QgsProcessingParameterDatabaseSchema(
+            self.SCHEMA_OPENADS,
             label,
             self.CONNECTION_NAME,
             defaultValue=default,
@@ -76,7 +88,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.TRUNCATE_COMMUNES,
+                self.TRUNCATE_PARCELLES,
                 "Mise à jour de la table communes"
             )
         )
@@ -97,7 +109,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie")
         )
 
-    def initLayer(self, context, uri, schema, table, geom, sql, pk=None):
+    def init_layer(self, context, uri, schema, table, geom, sql, pk=None):
         if pk:
             uri.setDataSource(schema, table, geom, sql, pk)
         else:
@@ -115,26 +127,28 @@ class ImportCommunesAlg(BaseDataAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
 
         # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
+        output_layers = []
         layers_name = dict()
-        layers_name["communes"] = "id_communes"
+        layers_name["parcelles"] = "id_parcelles"
         metadata = QgsProviderRegistry.instance().providerMetadata('postgres')
         connection_name = self.parameterAsConnectionName(parameters, self.CONNECTION_NAME, context)
-        schema = self.parameterAsSchema(parameters, self.SCHEMA, context)
+        schema_cadastre = self.parameterAsSchema(parameters, self.SCHEMA_CADASTRE, context)
+        schema_openads = self.parameterAsSchema(parameters, self.SCHEMA_OPENADS, context)
 
-        data_update = self.parameterAsBool(parameters, self.TRUNCATE_COMMUNES, context)
+        data_update = self.parameterAsBool(parameters, self.TRUNCATE_PARCELLES, context)
 
         connection = metadata.findConnection(connection_name)
         if not connection:
             raise QgsProcessingException("La connexion {} n'existe pas.".format(connection_name))
 
         if data_update:
-            feedback.pushInfo("## Mise à jour des données communes ##")
+            feedback.pushInfo("## Mise à jour des données parcelles ##")
 
-            sql = """
-                INSERT INTO openads.communes (anneemajic,ccodep,ccocom,nom,geom)
+            sql = f"""
+                INSERT INTO {schema_openads}.communes (anneemajic,ccodep,ccocom,nom,geom)
                 SELECT cm.annee, cm.ccodep, cm.ccocom, cm.libcom, gc.geom 
-                FROM cadastre.commune_majic cm
-                JOIN cadastre.geo_commune gc on gc.commune = cm.commune;
+                FROM {schema_cadastre}.commune_majic cm
+                JOIN {schema_cadastre}.geo_commune gc on gc.commune = cm.commune;
             """
             try:
                 connection.executeSql(sql)
@@ -148,20 +162,20 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             uri = QgsDataSourceUri(connection.uri())
             is_host = uri.host() != ""
             if is_host:
-                feedback.pushInfo("Connexion établie via l'hote")
+                feedback.pushInfo("Connexion établie via l'hôte")
             else:
                 feedback.pushInfo("Connexion établie via le service")
             feedback.pushInfo("")
             feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
             for x in layers_name:
                 if not context.project().mapLayersByName(x):
-                    result = self.initLayer(
-                        context, uri, 'adresse', x, None, "", layers_name[x]
+                    result = self.init_layer(
+                        context, uri, schema_openads, x, None, "", layers_name[x]
                     )
                     if not result:
-                        feedback.pushInfo("La couche " + x + " ne peut pas être chargée")
+                        feedback.pushInfo(f"La couche {x} ne peut pas être chargée")
                     else:
-                        feedback.pushInfo("La couche " + x + " a pu être chargée")
+                        feedback.pushInfo(f"La couche {x} a pu être chargée")
                         output_layers.append(result.id())
 
         msg = "success"

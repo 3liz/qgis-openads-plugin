@@ -28,7 +28,8 @@ class ImportParcellesAlg(BaseDataAlgorithm):
     """
 
     CONNECTION_NAME = "CONNECTION_NAME"
-    SCHEMA = "SCHEMA"
+    SCHEMA_OPENADS = "SCHEMA_OPENADS"
+    SCHEMA_CADASTRE = "SCHEMA_CADASTRE"
     TRUNCATE_PARCELLES = "TRUNCATE_PARCELLES"
     IMPORT_PROJECT_LAYER = "IMPORT_PROJECT_LAYER"
     OUTPUT = "OUTPUT"
@@ -59,11 +60,24 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         param.setHelp(tooltip)
         self.addParameter(param)
 
-        label = "Schéma"
+        label = "Schéma Cadastre"
         tooltip = 'Nom du schéma des données cadastre'
-        default = 'adresse'
+        default = 'cadastre'
         param = QgsProcessingParameterDatabaseSchema(
-            self.SCHEMA,
+            self.SCHEMA_CADASTRE,
+            label,
+            self.CONNECTION_NAME,
+            defaultValue=default,
+            optional=False,
+        )
+        param.setHelp(tooltip)
+        self.addParameter(param)
+
+        label = "Schéma openADS"
+        tooltip = 'Nom du schéma des données openADS'
+        default = 'openads'
+        param = QgsProcessingParameterDatabaseSchema(
+            self.SCHEMA_OPENADS,
             label,
             self.CONNECTION_NAME,
             defaultValue=default,
@@ -95,7 +109,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
             QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie")
         )
 
-    def initLayer(self, context, uri, schema, table, geom, sql, pk=None):
+    def init_layer(self, context, uri, schema, table, geom, sql, pk=None):
         if pk:
             uri.setDataSource(schema, table, geom, sql, pk)
         else:
@@ -113,11 +127,13 @@ class ImportParcellesAlg(BaseDataAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
 
         # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
+        output_layers = ""
         layers_name = dict()
         layers_name["parcelles"] = "id_parcelles"
         metadata = QgsProviderRegistry.instance().providerMetadata('postgres')
         connection_name = self.parameterAsConnectionName(parameters, self.CONNECTION_NAME, context)
-        schema = self.parameterAsSchema(parameters, self.SCHEMA, context)
+        schema_cadastre = self.parameterAsSchema(parameters, self.SCHEMA_CADASTRE, context)
+        schema_openads = self.parameterAsSchema(parameters, self.SCHEMA_OPENADS, context)
 
         data_update = self.parameterAsBool(parameters, self.TRUNCATE_PARCELLES, context)
 
@@ -128,11 +144,11 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         if data_update:
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
-            sql = """
-                INSERT INTO openads.communes (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom)
+            sql = f"""
+                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom)
                 SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom
-                FROM cadastre.parcelle p
-                JOIN cadastre.parcelle_info pi on pi.geo_parcelle = p.parcelle;
+                FROM {schema_cadastre}.parcelle p
+                JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle;
             """
             try:
                 connection.executeSql(sql)
@@ -146,20 +162,20 @@ class ImportParcellesAlg(BaseDataAlgorithm):
             uri = QgsDataSourceUri(connection.uri())
             is_host = uri.host() != ""
             if is_host:
-                feedback.pushInfo("Connexion établie via l'hote")
+                feedback.pushInfo("Connexion établie via l'hôte")
             else:
                 feedback.pushInfo("Connexion établie via le service")
             feedback.pushInfo("")
             feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
-            for x in layers_name_none:
+            for x in layers_name:
                 if not context.project().mapLayersByName(x):
-                    result = self.initLayer(
-                        context, uri, 'adresse', x, None, "", layers_name_none[x]
+                    result = self.init_layer(
+                        context, uri, schema_openads, x, None, "", layers_name[x]
                     )
                     if not result:
-                        feedback.pushInfo("La couche " + x + " ne peut pas être chargée")
+                        feedback.pushInfo(f"La couche {x} ne peut pas être chargée")
                     else:
-                        feedback.pushInfo("La couche " + x + " a pu être chargée")
+                        feedback.pushInfo(f"La couche {x} a pu être chargée")
                         output_layers.append(result.id())
 
         msg = "success"
