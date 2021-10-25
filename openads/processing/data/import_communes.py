@@ -140,8 +140,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
 
         connection = metadata.findConnection(connection_name)
         if not connection:
-            raise QgsProcessingException("La connexion {} n'existe pas.".format(connection_name))
-
+            raise QgsProcessingException(f"La connexion {connection_name} n'existe pas.")
         if data_update:
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 

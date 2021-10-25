@@ -110,6 +110,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         )
 
     def init_layer(self, context: QgsProcessingContext, uri: str, schema: str, table: str, geom: str, sql: str, pk: str=None):
+        """Create vector layer from database table"""
         if pk:
             uri.setDataSource(schema, table, geom, sql, pk)
         else:
@@ -139,7 +140,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
 
         connection = metadata.findConnection(connection_name)
         if not connection:
-            raise QgsProcessingException("La connexion {} n'existe pas.".format(connection_name))
+            raise QgsProcessingException(f"La connexion {connection_name} n'existe pas.")
 
         if data_update:
             feedback.pushInfo("## Mise à jour des données parcelles ##")
