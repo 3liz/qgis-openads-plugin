@@ -146,10 +146,20 @@ class ImportParcellesAlg(BaseDataAlgorithm):
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
             sql = f"""
-                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom)
-                SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom
+                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom,ident,ndeb,sbeb,nom,type)
+                SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom,
+				CASE WHEN ccopre IS NULL THEN 
+					p.ccodep || p.ccodir || p.ccocom || '000' || '0' || p.ccosec || p.dnupla
+                ELSE 
+				    p.ccodep || p.ccodir || p.ccocom || p.ccopre || '0' || p.ccosec || p.dnupla 
+				END AS ident, 
+                p.dnvoiri, p.dindic, v.natvoi
+                FROM cadastre.parcelle p
+                JOIN cadastre.parcelle_info pi on pi.geo_parcelle = p.parcelle
+                JOIN cadastre.voie v on v.voie = pi.voie
                 FROM {schema_cadastre}.parcelle p
-                JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle;
+                JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
+                JOIN {schema_cadastre}.voie v on v.voie = pi.voie;
             """
             try:
                 connection.executeSql(sql)
