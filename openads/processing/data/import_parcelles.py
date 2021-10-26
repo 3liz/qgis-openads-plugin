@@ -172,7 +172,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
 
             sql = f"""
                 INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom,ident,ndeb,sdeb,nom,type)
-                SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, ST_GeometryN(pi.geom, 1),
+                SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom,
 				CASE WHEN ccopre IS NULL THEN
 					p.ccodep || p.ccodir || p.ccocom || '000' || '0' || p.ccosec || p.dnupla
                 ELSE

@@ -169,7 +169,7 @@ CREATE TABLE openads.parcelles (
     sdeb text,
     nom text,
     type text,
-    geom public.geometry(Polygon,2154)
+    geom public.geometry(MultiPolygon,2154)
 );
 
 
