@@ -197,7 +197,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             for x in layers_name:
                 if not context.project().mapLayersByName(x):
                     result = self.init_layer(
-                        context, uri, schema_openads, x, None, "", layers_name[x]
+                        context, uri, schema_openads, x, "geom", "", layers_name[x]
                     )
                     if not result:
                         feedback.pushInfo(f"La couche {x} ne peut pas être chargée")
