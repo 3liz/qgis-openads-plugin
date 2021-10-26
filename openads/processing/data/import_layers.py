@@ -2,18 +2,14 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-from typing import Union
 
 from qgis.core import (
-    QgsDataSourceUri,
     QgsExpressionContextUtils,
-    QgsProcessingContext,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
     QgsProcessingParameterDatabaseSchema,
     QgsProcessingParameterProviderConnection,
     QgsProviderRegistry,
-    QgsVectorLayer,
 )
 
 from openads.processing.data.base import BaseDataAlgorithm
@@ -76,31 +72,6 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
 
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
-    def init_layer(
-        self,
-        context: QgsProcessingContext,
-        uri: str,
-        schema: str,
-        table: str,
-        geom: str,
-        sql: str,
-        pk: str = None,
-    ) -> Union[QgsVectorLayer, bool]:
-        """Create vector layer from database table"""
-        if pk:
-            uri.setDataSource(schema, table, geom, sql, pk)
-        else:
-            uri.setDataSource(schema, table, geom, sql)
-        layer = QgsVectorLayer(uri.uri(), table, "postgres")
-        if not layer.isValid():
-            return False
-        context.temporaryLayerStore().addMapLayer(layer)
-        context.addLayerToLoadOnCompletion(
-            layer.id(),
-            QgsProcessingContext.LayerDetails(table, context.project(), self.OUTPUT),
-        )
-        return layer
-
     def processAlgorithm(self, parameters, context, feedback):
         msg = ""
         output_layers = []
@@ -125,14 +96,8 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         feedback.pushInfo("## CONNEXION A LA BASE DE DONNEES ##")
 
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
-        connection = metadata.findConnection(connection_name)
-        uri = QgsDataSourceUri(connection.uri())
-
-        is_host = uri.host() != ""
-        if is_host:
-            feedback.pushInfo("Connexion établie via l'hôte")
-        else:
-            feedback.pushInfo("Connexion établie via le service")
+        metadata.findConnection(connection_name)
+        uri = get_uri(connection_name)
 
         feedback.pushInfo("")
         feedback.pushInfo("## CHARGEMENT DES COUCHES ##")

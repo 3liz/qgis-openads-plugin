@@ -2,12 +2,10 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-from typing import Union
 
 from qgis.core import (
     QgsDataSourceUri,
     QgsExpressionContextUtils,
-    QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
@@ -16,7 +14,6 @@ from qgis.core import (
     QgsProcessingParameterProviderConnection,
     QgsProviderConnectionException,
     QgsProviderRegistry,
-    QgsVectorLayer,
 )
 
 from openads.processing.data.base import BaseDataAlgorithm
@@ -106,31 +103,6 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         )
 
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
-
-    def init_layer(
-        self,
-        context: QgsProcessingContext,
-        uri: QgsDataSourceUri,
-        schema: str,
-        table: str,
-        geom: str,
-        sql: str,
-        pk: str = None,
-    ) -> Union[QgsVectorLayer, bool]:
-        """Create vector layer from database table"""
-        if pk:
-            uri.setDataSource(schema, table, geom, sql, pk)
-        else:
-            uri.setDataSource(schema, table, geom, sql)
-        layer = QgsVectorLayer(uri.uri(), table, "postgres")
-        if not layer.isValid():
-            return False
-        context.temporaryLayerStore().addMapLayer(layer)
-        context.addLayerToLoadOnCompletion(
-            layer.id(),
-            QgsProcessingContext.LayerDetails(table, context.project(), self.OUTPUT),
-        )
-        return layer
 
     def processAlgorithm(self, parameters, context, feedback):
 
