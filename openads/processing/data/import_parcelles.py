@@ -135,7 +135,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
     def processAlgorithm(self, parameters, context, feedback):
 
         # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
-        output_layers = ""
+        output_layers = []
         layers_name = dict()
         layers_name["parcelles"] = "id_parcelles"
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")

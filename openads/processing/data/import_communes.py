@@ -171,7 +171,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
 
             sql = f"""
                 INSERT INTO {schema_openads}.communes (anneemajic,ccodep,codcomm,nom,geom)
-                SELECT cm.annee, cm.ccodep, cm.ccocom, cm.libcom, gc.geom
+                SELECT cm.annee::int, cm.ccodep, cm.ccocom, cm.libcom, gc.geom
                 FROM {schema_cadastre}.commune_majic cm
                 JOIN {schema_cadastre}.geo_commune gc on gc.commune = cm.commune;
             """
