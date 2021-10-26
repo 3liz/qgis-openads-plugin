@@ -2,12 +2,9 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-from typing import Union
 
 from qgis.core import (
-    QgsDataSourceUri,
     QgsExpressionContextUtils,
-    QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
@@ -16,7 +13,6 @@ from qgis.core import (
     QgsProcessingParameterProviderConnection,
     QgsProviderConnectionException,
     QgsProviderRegistry,
-    QgsVectorLayer,
 )
 
 from openads.processing.data.base import BaseDataAlgorithm
@@ -107,37 +103,10 @@ class ImportParcellesAlg(BaseDataAlgorithm):
 
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
-    def init_layer(
-        self,
-        context: QgsProcessingContext,
-        uri: QgsDataSourceUri,
-        schema: str,
-        table: str,
-        geom: str,
-        sql: str,
-        pk: str = None,
-    ) -> Union[QgsVectorLayer, bool]:
-        """Create vector layer from database table"""
-        if pk:
-            uri.setDataSource(schema, table, geom, sql, pk)
-        else:
-            uri.setDataSource(schema, table, geom, sql)
-        layer = QgsVectorLayer(uri.uri(), table, "postgres")
-        if not layer.isValid():
-            return False
-        context.temporaryLayerStore().addMapLayer(layer)
-        context.addLayerToLoadOnCompletion(
-            layer.id(),
-            QgsProcessingContext.LayerDetails(table, context.project(), self.OUTPUT),
-        )
-        return layer
-
     def processAlgorithm(self, parameters, context, feedback):
 
         # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
         output_layers = []
-        layers_name = dict()
-        layers_name["parcelles"] = "id_parcelles"
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
@@ -171,13 +140,14 @@ class ImportParcellesAlg(BaseDataAlgorithm):
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
             sql = f"""
-                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,ccosec,dnupla,geom,ident,ndeb,sdeb,nom,type)
+                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,
+                ccosec,dnupla,geom,ident,ndeb,sdeb,nom,type)
                 SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom,
-				CASE WHEN ccopre IS NULL THEN
-					p.ccodep || p.ccodir || p.ccocom || '000' || '0' || p.ccosec || p.dnupla
+                CASE WHEN ccopre IS NULL THEN
+                    p.ccodep || p.ccodir || p.ccocom || '000' || '0' || p.ccosec || p.dnupla
                 ELSE
-				    p.ccodep || p.ccodir || p.ccocom || p.ccopre || '0' || p.ccosec || p.dnupla
-				END AS ident,
+                    p.ccodep || p.ccodir || p.ccocom || p.ccopre || '0' || p.ccosec || p.dnupla
+                END AS ident,
                 p.dnvoiri, p.dindic, v.libvoi, v.natvoi
                 FROM {schema_cadastre}.parcelle p
                 JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
@@ -194,24 +164,17 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         )
 
         if import_layer:
-            uri = QgsDataSourceUri(connection.uri())
-            is_host = uri.host() != ""
-            if is_host:
-                feedback.pushInfo("Connexion établie via l'hôte")
-            else:
-                feedback.pushInfo("Connexion établie via le service")
+            result_msg, uri = self.get_uri(connection)
+            feedback.pushInfo(result_msg)
+
             feedback.pushInfo("")
-            feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
-            for x in layers_name:
-                if not context.project().mapLayersByName(x):
-                    result = self.init_layer(
-                        context, uri, schema_openads, x, "geom", "", layers_name[x]
-                    )
-                    if not result:
-                        feedback.pushInfo(f"La couche {x} ne peut pas être chargée")
-                    else:
-                        feedback.pushInfo(f"La couche {x} a pu être chargée")
-                        output_layers.append(result.id())
+            feedback.pushInfo("## CHARGEMENT DE LA COUCHE ##")
+
+            name = "parcelles"
+            result_msg, layer = self.import_layer(context, uri, schema_openads, name)
+            feedback.pushInfo(result_msg)
+            if layer:
+                output_layers.append(layer.id())
 
         msg = "success"
 

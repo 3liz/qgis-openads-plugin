@@ -73,21 +73,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
     def processAlgorithm(self, parameters, context, feedback):
-        msg = ""
         output_layers = []
-        layers_name = dict()
-        layers_name["communes"] = dict()
-        layers_name["communes"]["id"] = ""
-        layers_name["communes"]["geom"] = "geom"
-        layers_name["parcelles"] = dict()
-        layers_name["parcelles"]["id"] = ""
-        layers_name["parcelles"]["geom"] = "geom"
-        layers_name["dossiers_openads"] = dict()
-        layers_name["dossiers_openads"]["id"] = ""
-        layers_name["dossiers_openads"]["geom"] = "geom"
-        layers_name["contraintes"] = dict()
-        layers_name["contraintes"]["id"] = ""
-        layers_name["contraintes"]["geom"] = None
 
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
@@ -96,26 +82,18 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         feedback.pushInfo("## CONNEXION A LA BASE DE DONNEES ##")
 
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
-        metadata.findConnection(connection_name)
-        uri = get_uri(connection_name)
+        connection = metadata.findConnection(connection_name)
+        result_msg, uri = self.get_uri(connection)
+        feedback.pushInfo(result_msg)
 
         feedback.pushInfo("")
         feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
-        for x in layers_name:
-            if not context.project().mapLayersByName(x):
-                result = self.init_layer(
-                    context,
-                    uri,
-                    schema,
-                    x,
-                    layers_name[x]["geom"],
-                    "",
-                    layers_name[x]["id"],
-                )
-                if not result:
-                    feedback.pushWarning(f"La couche {x} ne peut pas être chargée")
-                else:
-                    feedback.pushInfo(f"La couche {x} a été chargée")
-                    output_layers.append(result.id())
 
+        for name in self.layers_name:
+            result_msg, layer = self.import_layer(context, uri, schema, name)
+            feedback.pushInfo(result_msg)
+            if layer:
+                output_layers.append(layer.id())
+
+        msg = "success"
         return {self.OUTPUT_MSG: msg, self.OUTPUT: output_layers}

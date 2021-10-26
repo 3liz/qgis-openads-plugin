@@ -4,7 +4,6 @@ __email__ = "info@3liz.org"
 
 
 from qgis.core import (
-    QgsDataSourceUri,
     QgsExpressionContextUtils,
     QgsProcessingException,
     QgsProcessingOutputMultipleLayers,
@@ -158,24 +157,17 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         )
 
         if import_layer:
-            uri = QgsDataSourceUri(connection.uri())
-            is_host = uri.host() != ""
-            if is_host:
-                feedback.pushInfo("Connexion établie via l'hôte")
-            else:
-                feedback.pushInfo("Connexion établie via le service")
+            result_msg, uri = self.get_uri(connection)
+            feedback.pushInfo(result_msg)
+
             feedback.pushInfo("")
-            feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
-            for x in layers_name:
-                if not context.project().mapLayersByName(x):
-                    result = self.init_layer(
-                        context, uri, schema_openads, x, "geom", "", layers_name[x]
-                    )
-                    if not result:
-                        feedback.pushInfo(f"La couche {x} ne peut pas être chargée")
-                    else:
-                        feedback.pushInfo(f"La couche {x} a pu être chargée")
-                        output_layers.append(result.id())
+            feedback.pushInfo("## CHARGEMENT DE LA COUCHE ##")
+
+            name = "communes"
+            result_msg, layer = self.import_layer(context, uri, schema_openads, name)
+            feedback.pushInfo(result_msg)
+            if layer:
+                output_layers.append(layer.id())
 
         msg = "success"
 
