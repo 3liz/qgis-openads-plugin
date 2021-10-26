@@ -5,9 +5,9 @@ __email__ = "info@3liz.org"
 from qgis.core import QgsProcessingProvider
 from qgis.PyQt.QtGui import QIcon
 
-from openads.processing.database.create import CreateDatabaseStructure
 from openads.processing.data.import_communes import ImportCommunesAlg
 from openads.processing.data.import_parcelles import ImportParcellesAlg
+from openads.processing.database.create import CreateDatabaseStructure
 from openads.qgis_plugin_tools import resources_path
 
 # from openads.processing.database.upgrade import UpgradeDatabaseStructure

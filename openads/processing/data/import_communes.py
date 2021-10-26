@@ -2,21 +2,21 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
+from typing import Union
+
 from qgis.core import (
     QgsDataSourceUri,
+    QgsExpressionContextUtils,
+    QgsProcessingContext,
+    QgsProcessingException,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
     QgsProcessingParameterBoolean,
-    QgsProcessingContext,
-    QgsProviderRegistry,
-    QgsVectorLayer,
-    QgsProcessingException,
-    QgsExpressionContextUtils,
-    QgsProviderConnectionException,
-)
-from qgis.core import (
     QgsProcessingParameterDatabaseSchema,
     QgsProcessingParameterProviderConnection,
+    QgsProviderConnectionException,
+    QgsProviderRegistry,
+    QgsVectorLayer,
 )
 
 from openads.processing.data.base import BaseDataAlgorithm
@@ -49,20 +49,22 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         # Database connection parameters
         label = "Connexion PostgreSQL vers la base de données"
         tooltip = "Base de données de destination"
-        default = QgsExpressionContextUtils.globalScope().variable('openads_connection_name')
+        default = QgsExpressionContextUtils.globalScope().variable(
+            "openads_connection_name"
+        )
         param = QgsProcessingParameterProviderConnection(
             self.CONNECTION_NAME,
             label,
             "postgres",
             optional=False,
-            defaultValue=default
+            defaultValue=default,
         )
         param.setHelp(tooltip)
         self.addParameter(param)
 
         label = "Schéma Cadastre"
-        tooltip = 'Nom du schéma des données cadastre'
-        default = 'cadastre'
+        tooltip = "Nom du schéma des données cadastre"
+        default = "cadastre"
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA_CADASTRE,
             label,
@@ -74,8 +76,8 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         self.addParameter(param)
 
         label = "Schéma openADS"
-        tooltip = 'Nom du schéma des données openADS'
-        default = 'openads'
+        tooltip = "Nom du schéma des données openADS"
+        default = "openads"
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA_OPENADS,
             label,
@@ -88,15 +90,13 @@ class ImportCommunesAlg(BaseDataAlgorithm):
 
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.TRUNCATE_PARCELLES,
-                "Mise à jour de la table communes"
+                self.TRUNCATE_PARCELLES, "Mise à jour de la table communes"
             )
         )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
-                self.IMPORT_PROJECT_LAYER,
-                "Importer la couche dans le projet"
+                self.IMPORT_PROJECT_LAYER, "Importer la couche dans le projet"
             )
         )
 
@@ -105,11 +105,18 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             QgsProcessingOutputMultipleLayers(self.OUTPUT, "Couches de sortie")
         )
 
-        self.addOutput(
-            QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie")
-        )
+        self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
-    def init_layer(self, context: QgsProcessingContext, uri: str, schema: str, table: str, geom: str, sql: str, pk: str=None) -> QgsVectorLayer:
+    def init_layer(
+        self,
+        context: QgsProcessingContext,
+        uri: str,
+        schema: str,
+        table: str,
+        geom: str,
+        sql: str,
+        pk: str = None,
+    ) -> Union[QgsVectorLayer, bool]:
         """Create vector layer from database table"""
         if pk:
             uri.setDataSource(schema, table, geom, sql, pk)
@@ -131,22 +138,30 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         output_layers = []
         layers_name = dict()
         layers_name["parcelles"] = "id_parcelles"
-        metadata = QgsProviderRegistry.instance().providerMetadata('postgres')
-        connection_name = self.parameterAsConnectionName(parameters, self.CONNECTION_NAME, context)
-        schema_cadastre = self.parameterAsSchema(parameters, self.SCHEMA_CADASTRE, context)
-        schema_openads = self.parameterAsSchema(parameters, self.SCHEMA_OPENADS, context)
+        metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
+        connection_name = self.parameterAsConnectionName(
+            parameters, self.CONNECTION_NAME, context
+        )
+        schema_cadastre = self.parameterAsSchema(
+            parameters, self.SCHEMA_CADASTRE, context
+        )
+        schema_openads = self.parameterAsSchema(
+            parameters, self.SCHEMA_OPENADS, context
+        )
 
         data_update = self.parameterAsBool(parameters, self.TRUNCATE_PARCELLES, context)
 
         connection = metadata.findConnection(connection_name)
         if not connection:
-            raise QgsProcessingException(f"La connexion {connection_name} n'existe pas.")
+            raise QgsProcessingException(
+                f"La connexion {connection_name} n'existe pas."
+            )
         if data_update:
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
             sql = f"""
                 INSERT INTO {schema_openads}.communes (anneemajic,ccodep,ccocom,nom,geom)
-                SELECT cm.annee, cm.ccodep, cm.ccocom, cm.libcom, gc.geom 
+                SELECT cm.annee, cm.ccodep, cm.ccocom, cm.libcom, gc.geom
                 FROM {schema_cadastre}.commune_majic cm
                 JOIN {schema_cadastre}.geo_commune gc on gc.commune = cm.commune;
             """
@@ -156,7 +171,9 @@ class ImportCommunesAlg(BaseDataAlgorithm):
                 connection.executeSql("ROLLBACK;")
                 return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
 
-        import_layer = self.parameterAsBool(parameters, self.IMPORT_PROJECT_LAYER, context)
+        import_layer = self.parameterAsBool(
+            parameters, self.IMPORT_PROJECT_LAYER, context
+        )
 
         if import_layer:
             uri = QgsDataSourceUri(connection.uri())

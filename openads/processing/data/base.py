@@ -11,4 +11,3 @@ class BaseDataAlgorithm(BaseProcessingAlgorithm):
 
     def groupId(self):
         return "data"
-
