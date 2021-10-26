@@ -160,7 +160,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
             sql = f"""
-                INSERT INTO {schema_openads}.communes (anneemajic,ccodep,ccocom,nom,geom)
+                INSERT INTO {schema_openads}.communes (anneemajic,ccodep,codcomm,nom,geom)
                 SELECT cm.annee, cm.ccodep, cm.ccocom, cm.libcom, gc.geom
                 FROM {schema_cadastre}.commune_majic cm
                 JOIN {schema_cadastre}.geo_commune gc on gc.commune = cm.commune;
