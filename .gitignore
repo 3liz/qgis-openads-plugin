@@ -3,7 +3,7 @@ __pycache__/
 *.pyc
 venv/
 .venv/
-openads/tests/.pytest_cache/
+*.pytest_cache/
 
 # Mkdocs
 build/
