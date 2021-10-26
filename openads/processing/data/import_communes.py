@@ -110,7 +110,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
     def init_layer(
         self,
         context: QgsProcessingContext,
-        uri: str,
+        uri: QgsDataSourceUri,
         schema: str,
         table: str,
         geom: str,
