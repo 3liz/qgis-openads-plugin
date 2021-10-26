@@ -168,7 +168,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                 ELSE
 				    p.ccodep || p.ccodir || p.ccocom || p.ccopre || '0' || p.ccosec || p.dnupla
 				END AS ident,
-                p.dnvoiri, p.dindic, v.natvoi
+                p.dnvoiri, p.dindic, v.libvoi, v.natvoi
                 FROM {schema_cadastre}.parcelle p
                 JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
                 JOIN {schema_cadastre}.voie v on v.voie = pi.voie;
