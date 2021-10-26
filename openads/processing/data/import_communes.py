@@ -137,7 +137,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
         output_layers = []
         layers_name = dict()
-        layers_name["commune"] = "id_communes"
+        layers_name["communes"] = "id_communes"
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
