@@ -157,6 +157,16 @@ class ImportCommunesAlg(BaseDataAlgorithm):
                 f"La connexion {connection_name} n'existe pas."
             )
         if data_update:
+            feedback.pushInfo("# Vide la table openads.communes #")
+            sql = """
+                TRUNCATE openads.communes RESTART IDENTITY;
+            """
+            try:
+                connection.executeSql(sql)
+            except QgsProviderConnectionException as e:
+                connection.executeSql("ROLLBACK;")
+                return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
+
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
             sql = f"""
