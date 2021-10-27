@@ -18,6 +18,23 @@ class BaseDataAlgorithm(BaseProcessingAlgorithm):
 
     OUTPUT = None
 
+    def __init__(self):
+        """Constructor."""
+        super().__init__()
+        self.layers_name = dict()
+        self.layers_name["communes"] = dict()
+        self.layers_name["communes"]["id"] = "id_communes"
+        self.layers_name["communes"]["geom"] = "geom"
+        self.layers_name["parcelles"] = dict()
+        self.layers_name["parcelles"]["id"] = "id_parcelles"
+        self.layers_name["parcelles"]["geom"] = "geom"
+        self.layers_name["dossiers_openads"] = dict()
+        self.layers_name["dossiers_openads"]["id"] = "id_dossiers_openads"
+        self.layers_name["dossiers_openads"]["geom"] = "geom"
+        self.layers_name["contraintes"] = dict()
+        self.layers_name["contraintes"]["id"] = "id_contraintes"
+        self.layers_name["contraintes"]["geom"] = None
+
     def group(self):
         return "Import des données"
 
@@ -48,20 +65,6 @@ class BaseDataAlgorithm(BaseProcessingAlgorithm):
             QgsProcessingContext.LayerDetails(table, context.project(), self.OUTPUT),
         )
         return layer
-
-    layers_name = dict()
-    layers_name["communes"] = dict()
-    layers_name["communes"]["id"] = "id_communes"
-    layers_name["communes"]["geom"] = "geom"
-    layers_name["parcelles"] = dict()
-    layers_name["parcelles"]["id"] = "id_parcelles"
-    layers_name["parcelles"]["geom"] = "geom"
-    layers_name["dossiers_openads"] = dict()
-    layers_name["dossiers_openads"]["id"] = "id_dossiers_openads"
-    layers_name["dossiers_openads"]["geom"] = "geom"
-    layers_name["contraintes"] = dict()
-    layers_name["contraintes"]["id"] = "id_contraintes"
-    layers_name["contraintes"]["geom"] = None
 
     @staticmethod
     def get_uri(

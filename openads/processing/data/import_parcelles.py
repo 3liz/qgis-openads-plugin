@@ -35,7 +35,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         return "data_parcelle"
 
     def displayName(self):
-        return "Mise en place des données sur les parcelles"
+        return "Import des parcelles"
 
     def shortHelpString(self):
         return "Ajout des données pour la table parcelles"
@@ -104,9 +104,6 @@ class ImportParcellesAlg(BaseDataAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
     def processAlgorithm(self, parameters, context, feedback):
-
-        # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
-        output_layers = []
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
@@ -135,7 +132,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                 connection.executeSql(sql)
             except QgsProviderConnectionException as e:
                 connection.executeSql("ROLLBACK;")
-                return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
+                return {self.OUTPUT_MSG: str(e), self.OUTPUT: []}
 
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
@@ -157,12 +154,13 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                 connection.executeSql(sql)
             except QgsProviderConnectionException as e:
                 connection.executeSql("ROLLBACK;")
-                return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
+                return {self.OUTPUT_MSG: str(e), self.OUTPUT: []}
 
         import_layer = self.parameterAsBool(
             parameters, self.IMPORT_PROJECT_LAYER, context
         )
 
+        output_layers = []
         if import_layer:
             result_msg, uri = self.get_uri(connection)
             feedback.pushInfo(result_msg)

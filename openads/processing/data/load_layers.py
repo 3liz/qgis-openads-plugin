@@ -73,8 +73,6 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
     def processAlgorithm(self, parameters, context, feedback):
-        output_layers = []
-
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
         )
@@ -89,6 +87,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         feedback.pushInfo("")
         feedback.pushInfo("## CHARGEMENT DES COUCHES ##")
 
+        output_layers = []
         for name in self.layers_name:
             result_msg, layer = self.import_layer(context, uri, schema, name)
             feedback.pushInfo(result_msg)

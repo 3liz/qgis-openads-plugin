@@ -35,7 +35,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         return "data_commune"
 
     def displayName(self):
-        return "Mise en place des données sur les communes"
+        return "Import des communes"
 
     def shortHelpString(self):
         return "Ajout des données pour la table communes"
@@ -104,11 +104,6 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
     def processAlgorithm(self, parameters, context, feedback):
-
-        # override = self.parameterAsBool(parameters, self.OVERRIDE, context)
-        output_layers = []
-        layers_name = dict()
-        layers_name["communes"] = "id_communes"
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
@@ -136,7 +131,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
                 connection.executeSql(sql)
             except QgsProviderConnectionException as e:
                 connection.executeSql("ROLLBACK;")
-                return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
+                return {self.OUTPUT_MSG: str(e), self.OUTPUT: []}
 
             feedback.pushInfo("## Mise à jour des données parcelles ##")
 
@@ -150,12 +145,13 @@ class ImportCommunesAlg(BaseDataAlgorithm):
                 connection.executeSql(sql)
             except QgsProviderConnectionException as e:
                 connection.executeSql("ROLLBACK;")
-                return {self.OUTPUT_MSG: str(e), self.OUTPUT: output_layers}
+                return {self.OUTPUT_MSG: str(e), self.OUTPUT: []}
 
         import_layer = self.parameterAsBool(
             parameters, self.IMPORT_PROJECT_LAYER, context
         )
 
+        output_layers = []
         if import_layer:
             result_msg, uri = self.get_uri(connection)
             feedback.pushInfo(result_msg)
