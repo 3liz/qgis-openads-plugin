@@ -28,7 +28,7 @@ schemaspy:
 	@cd .docker && ./stop.sh
 
 processing-doc:
-	@echo 'Need to write it'
+	@cd .docker && ./processing_doc.sh
 
 reformat_sql:
 	@echo 'Reformat SQL'
