@@ -15,6 +15,9 @@ from openads.processing.base import BaseProcessingAlgorithm
 
 
 class BaseDataAlgorithm(BaseProcessingAlgorithm):
+
+    OUTPUT = None
+
     def group(self):
         return "Import des données"
 
