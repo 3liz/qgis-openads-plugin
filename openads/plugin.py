@@ -16,21 +16,21 @@ URL_DOCUMENTATION = "http://packages.3liz.org/private/openads/"
 
 class OpenAdsPlugin:
 
-    """ Main entry point of the plugin. """
+    """Main entry point of the plugin."""
 
     def __init__(self):
-        """ Concstructor. """
+        """Constructor."""
         self.provider = None
         self.help_action = None
 
     def initProcessing(self):  # pylint: disable=invalid-name
-        """ Init the processing provider. """
+        """Init the processing provider."""
         if not self.provider:
             self.provider = OpenAdsProvider()
             QgsApplication.processingRegistry().addProvider(self.provider)
 
     def initGui(self):  # pylint: disable=invalid-name
-        """ Init the GUI. """
+        """Init the GUI."""
         self.initProcessing()
 
         icon = QIcon(str(resources_path("icons", "icon.png")))
@@ -41,7 +41,7 @@ class OpenAdsPlugin:
         self.help_action.triggered.connect(self.open_help)
 
     def unload(self):
-        """ Unload the plugin from QGIS. """
+        """Unload the plugin from QGIS."""
         if self.provider:
             QgsApplication.processingRegistry().removeProvider(self.provider)
 
@@ -51,5 +51,5 @@ class OpenAdsPlugin:
 
     @staticmethod
     def open_help():
-        """ Open the online help. """
+        """Open the online help."""
         QDesktopServices.openUrl(QUrl(URL_DOCUMENTATION))

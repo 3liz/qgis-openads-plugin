@@ -167,7 +167,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         feedback: QgsProcessingFeedback,
         plugin_dir: Path,
     ):
-        """ Install all SQL files in the given connection. """
+        """Install all SQL files in the given connection."""
         sql_files = (
             "00_initialize_database.sql",
             f"{SCHEMA}/10_FUNCTION.sql",
@@ -203,7 +203,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         plugin_version: int,
         run_migration: bool,
     ) -> int:
-        """ Add the plugin version in the metadata table. """
+        """Add the plugin version in the metadata table."""
         if run_migration or not dev_version:
             metadata_version = plugin_version
         else:

@@ -46,7 +46,7 @@ class TestProcessing(unittest.TestCase):
         time.sleep(1)
 
     def test_install_database(self):
-        """ Test we can install the database. """
+        """Test we can install the database."""
         provider = ProcessingProvider()
         registry = QgsApplication.processingRegistry()
         if not registry.providerById(provider.id()):

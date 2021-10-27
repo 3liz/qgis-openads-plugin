@@ -11,7 +11,7 @@ from qgis.PyQt import uic
 
 
 def plugin_path(*args) -> Path:
-    """ Return the path to the plugin root folder. """
+    """Return the path to the plugin root folder."""
     path = Path(__file__).resolve().parent
     for item in args:
         path = path.joinpath(item)
@@ -20,17 +20,17 @@ def plugin_path(*args) -> Path:
 
 
 def resources_path(*args) -> Path:
-    """ Return the path to the plugin resources folder. """
+    """Return the path to the plugin resources folder."""
     return plugin_path("resources", *args)
 
 
 def plugin_test_data_path(*args) -> Path:
-    """ Return the path to the plugin test data folder. """
+    """Return the path to the plugin test data folder."""
     return plugin_path("tests", "fixtures", *args)
 
 
 def load_ui(*args):
-    """ Return the UI compiled file from the resources folder. """
+    """Return the UI compiled file from the resources folder."""
     ui_class, _ = uic.loadUiType(resources_path("ui", *args))
     return ui_class
 

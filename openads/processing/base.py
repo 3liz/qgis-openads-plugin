@@ -27,7 +27,7 @@ class BaseProcessingAlgorithm(QgsProcessingAlgorithm):
             return super().icon()
 
     def parameters_help_string(self) -> str:
-        """ Return a formatted help string for all parameters. """
+        """Return a formatted help string for all parameters."""
         help_string = ""
         for param in self.parameterDefinitions():
             info = param.help()

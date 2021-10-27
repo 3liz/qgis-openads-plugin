@@ -25,7 +25,7 @@ class BaseDatabaseAlgorithm(BaseProcessingAlgorithm):
         connection: QgsAbstractDatabaseProviderConnection,
         feedback: QgsProcessingFeedback,
     ):
-        """ Execute a vacuum to recompute the feature count. """
+        """Execute a vacuum to recompute the feature count."""
         for table in connection.tables(SCHEMA):
 
             if table.tableName().startswith("v_"):
