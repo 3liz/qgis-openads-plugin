@@ -26,7 +26,7 @@ COMMENT ON TABLE openads.dossiers_openads IS 'Stocke les dossiers créés automa
 
 
 -- dossiers_sig
-COMMENT ON TABLE openads.dossiers_sig IS 'Stocke les dossiers spécifiques au SIG, notamment ceux déssinés à la main par les utilisateurs';
+COMMENT ON TABLE openads.dossiers_sig IS 'Stocke les dossiers spécifiques au SIG, notamment ceux dessinés à la main par les utilisateurs';
 
 
 -- contraintes
