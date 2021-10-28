@@ -55,6 +55,7 @@ class TestProcessing(unittest.TestCase):
         params = {
             "CONNECTION_NAME": "test_database",
             "OVERRIDE": True,
+            "CRS": "EPSG:2154",
         }
         alg = "{}:create_database_structure".format(provider.id())
         results = processing.run(alg, params)
