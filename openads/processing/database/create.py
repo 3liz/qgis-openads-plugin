@@ -8,11 +8,13 @@ from pathlib import Path
 
 from qgis.core import (
     QgsAbstractDatabaseProviderConnection,
+    QgsCoordinateReferenceSystem,
     QgsExpressionContextUtils,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputString,
     QgsProcessingParameterBoolean,
+    QgsProcessingParameterCrs,
     QgsProcessingParameterProviderConnection,
     QgsProviderConnectionException,
     QgsProviderRegistry,
@@ -37,6 +39,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
     """
 
     CONNECTION_NAME = "CONNECTION_NAME"
+    CRS = "CRS"
     OVERRIDE = "OVERRIDE"
     DATABASE_VERSION = "DATABASE_VERSION"
 
@@ -44,11 +47,17 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         return "create_database_structure"
 
     def displayName(self):
-        return "Installation de la structure sur la base de données"
+        return "Installation de la base de données"
 
     def shortHelpString(self):
         return "Création de la structure de la base données. "
 
+    @classmethod
+    def default_crs(cls) -> str:
+        """Default CRS for the database, without the authority."""
+        return "2154"
+
+    # noinspection PyMethodOverriding
     def initAlgorithm(self, config):
         connection_name = QgsExpressionContextUtils.globalScope().variable(
             DEFAULT_CONNECTION_NAME
@@ -64,6 +73,14 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             "Nom de la connexion dans QGIS pour se connecter à la base de données"
         )
         self.addParameter(param)
+
+        self.addParameter(
+            QgsProcessingParameterCrs(
+                self.CRS,
+                "Projection",
+                defaultValue=f"EPSG:{self.default_crs()}",
+            )
+        )
 
         self.addParameter(
             QgsProcessingParameterBoolean(
@@ -92,6 +109,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         if not connection:
             raise QgsProcessingException(f"La connexion {connection_name} n'existe pas")
 
+        # noinspection PyUnresolvedReferences
         if SCHEMA in connection.schemas():
             override = self.parameterAsBool(parameters, self.OVERRIDE, context)
             if not override:
@@ -102,6 +120,10 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
                 )
                 return False, msg
 
+        crs = self.parameterAsCrs(parameters, self.CRS, context)
+        if not crs.authid().startswith("EPSG:"):
+            return False, "Le système de projection doit être de type EPSG."
+
         return super().checkParameterValues(parameters, context)
 
     def processAlgorithm(self, parameters, context, feedback):
@@ -110,6 +132,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             parameters, self.CONNECTION_NAME, context
         )
 
+        # noinspection PyTypeChecker
         connection = metadata.findConnection(connection_name)
         if not connection:
             raise QgsProcessingException(
@@ -126,6 +149,9 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
                 connection.dropSchema(SCHEMA, True)
             except QgsProviderConnectionException as e:
                 raise QgsProcessingException(str(e))
+
+        crs = self.parameterAsCrs(parameters, self.CRS, context)
+        feedback.pushInfo(f"Projection de l'installation : {crs.authid()}")
 
         plugin_dir = plugin_path()
         plugin_version = pluginMetadata(PLUGIN_NAME, "version")
@@ -145,7 +171,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             )
             plugin_version = run_migration
 
-        self.create_sql_structure(connection, feedback, plugin_dir)
+        self.create_sql_structure(connection, feedback, plugin_dir, crs)
 
         metadata_version = self.add_version_info(
             connection, dev_version, feedback, plugin_version, run_migration
@@ -166,6 +192,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         connection: QgsAbstractDatabaseProviderConnection,
         feedback: QgsProcessingFeedback,
         plugin_dir: Path,
+        crs: QgsCoordinateReferenceSystem,
     ):
         """Install all SQL files in the given connection."""
         sql_files = (
@@ -188,6 +215,12 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             if len(sql.strip()) == 0:
                 feedback.pushInfo("  Skipped (empty file)")
                 continue
+
+            if crs.authid() != CreateDatabaseStructure.default_crs:
+                sql = sql.replace(
+                    CreateDatabaseStructure.default_crs(),
+                    crs.authid().replace("EPSG:", ""),
+                )
 
             try:
                 connection.executeSql(sql)
