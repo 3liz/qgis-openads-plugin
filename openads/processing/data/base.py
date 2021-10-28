@@ -85,7 +85,7 @@ class BaseDataAlgorithm(BaseProcessingAlgorithm):
         uri: QgsDataSourceUri,
         schema: str,
         name: str,
-    ) -> Union[Tuple[str, QgsVectorLayer], Tuple[str, bool]]:
+    ) -> Tuple[str, Union[bool, QgsVectorLayer]]:
         """Function to import layer"""
         if context.project().mapLayersByName(name):
             return f"La couche {name} est déjà présente", False

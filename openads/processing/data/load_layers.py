@@ -42,6 +42,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         default = QgsExpressionContextUtils.globalScope().variable(
             "openads_connection_name"
         )
+        # noinspection PyArgumentList
         param = QgsProcessingParameterProviderConnection(
             self.CONNECTION_NAME,
             label,
@@ -55,6 +56,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
         label = "Schéma"
         tooltip = "Nom du schéma des données openads"
         default = "openads"
+        # noinspection PyArgumentList
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA,
             label,

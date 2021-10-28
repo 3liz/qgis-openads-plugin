@@ -48,6 +48,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         default = QgsExpressionContextUtils.globalScope().variable(
             "openads_connection_name"
         )
+        # noinspection PyArgumentList
         param = QgsProcessingParameterProviderConnection(
             self.CONNECTION_NAME,
             label,
@@ -61,6 +62,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         label = "Schéma Cadastre"
         tooltip = "Nom du schéma des données cadastre"
         default = "cadastre"
+        # noinspection PyArgumentList
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA_CADASTRE,
             label,
@@ -74,6 +76,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
         label = "Schéma openADS"
         tooltip = "Nom du schéma des données openADS"
         default = "openads"
+        # noinspection PyArgumentList
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA_OPENADS,
             label,
