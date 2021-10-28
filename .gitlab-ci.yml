@@ -78,6 +78,11 @@ Build-doc:
 Upload-doc:
   stage: Release 🚀
   needs: ["Build-doc"]
+  rules:
+    - if: '$CI_COMMIT_TAG != null'
+      when: always
+    - if: '$CI_COMMIT_BRANCH == "main"'
+      when: manual
   script:
     - upload_folder_to_packages_server build/ private/${CUSTOMER}/docs
   tags:
