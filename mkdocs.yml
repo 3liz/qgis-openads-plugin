@@ -9,8 +9,8 @@ site_dir: build
 
 nav:
     - Accueil: index.md
-    - Traitements: processing/README.md
     - Guide utilisateur: user_guide/README.md
+    - Traitements: processing/README.md
     - Base de données: database/index.html
     - Changelog: changelog.md
     - Contribution: contributing.md
