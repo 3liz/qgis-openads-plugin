@@ -42,6 +42,8 @@ class TestProcessing(unittest.TestCase):
         self.maxDiff = None
 
     def tearDown(self) -> None:
+        if SCHEMA in self.connection.schemas():
+            self.connection.dropSchema(SCHEMA, True)
         del self.connection
         time.sleep(1)
 

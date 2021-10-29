@@ -3,19 +3,22 @@ __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
 import os
+import time
 
 from unittest import main
 
 import processing
 
-from qgis._core import (
+from qgis.core import (
+    QgsAbstractDatabaseProviderConnection,
+    QgsApplication,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsProcessingFeedback,
     QgsProject,
     QgsProviderRegistry,
     QgsVectorLayer,
 )
-from qgis.core import QgsApplication, QgsProcessingFeedback
 
 from openads.processing.provider import OpenAdsProvider as ProcessingProvider
 from openads.qgis_plugin_tools import plugin_test_data_path
@@ -42,14 +45,40 @@ class MyFeedBack(QgsProcessingFeedback):
         print(error)
 
 
+SCHEMA = "openads"
+
+
 class TestImport(TestCasePlugin):
-    def test_import_constraints(self):
-        """Test to import constraints in the database."""
+    def setUp(self) -> None:
+        self.metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
+        self.connection = self.metadata.findConnection("test_database")
+        self.connection: QgsAbstractDatabaseProviderConnection
+        if SCHEMA in self.connection.schemas():
+            self.connection.dropSchema(SCHEMA, True)
+        # self.feedback = LoggerProcessingFeedBack()
+        self.maxDiff = None
+
         provider = ProcessingProvider()
         registry = QgsApplication.processingRegistry()
         if not registry.providerById(provider.id()):
             registry.addProvider(provider)
 
+        params = {
+            "CONNECTION_NAME": "test_database",
+            "OVERRIDE": True,
+            "CRS": "EPSG:2154",
+        }
+        alg = "{}:create_database_structure".format(provider.id())
+        processing.run(alg, params)
+
+    def tearDown(self) -> None:
+        if SCHEMA in self.connection.schemas():
+            self.connection.dropSchema(SCHEMA, True)
+        del self.connection
+        time.sleep(1)
+
+    def test_import_constraints(self):
+        """Test to import constraints in the database."""
         params = {
             "ENTREE": str(
                 plugin_test_data_path("PLUI", "248000747_INFO_SURF_20201109.shp")
@@ -61,6 +90,7 @@ class TestImport(TestCasePlugin):
             "CONNECTION_NAME": os.getenv("TEST_QGIS_CONNEXION_NAME", "test_database"),
             "SCHEMA_OPENADS": "openads",
         }
+        provider = ProcessingProvider()
         alg = "{}:data_constraints".format(provider.id())
         results = processing.run(alg, params)
 
@@ -95,8 +125,8 @@ class TestImport(TestCasePlugin):
 
         results = processing.run(alg, params)
 
-        # We don't have municipalities
-        self.assertEqual(results["COUNT_FEATURES"], 69)
+        # We have municipalities now
+        self.assertEqual(results["COUNT_FEATURES"], 71)
         self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 0)
 
 

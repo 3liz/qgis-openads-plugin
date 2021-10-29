@@ -81,6 +81,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         param.setHelp("Couche vecteur qu'il faut importer dans la base de données")
         self.addParameter(param)
 
+        # noinspection PyArgumentList
         param = QgsProcessingParameterField(
             self.LABEL_FIELD,
             "Champ des étiquettes",
@@ -89,6 +90,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         param.setHelp("Champ des étiquettes pour la contrainte")
         self.addParameter(param)
 
+        # noinspection PyArgumentList
         param = QgsProcessingParameterField(
             self.TEXT_FIELD,
             "Champ texte",
@@ -106,14 +108,13 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         )
         self.addParameter(param)
 
+        # noinspection PyArgumentList
         param = QgsProcessingParameterString(
             self.SUB_GROUP_VALUE,
             "Valeur pour le sous-groupe",
             optional=True,
         )
-        param.setHelp(
-            "Zonage, contraintes, servitudes, droit de préemption, lotissement ou tout autre valeur libre"
-        )
+        param.setHelp("Valeur libre")
         self.addParameter(param)
 
         # noinspection PyArgumentList
@@ -150,6 +151,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             )
         )
 
+    # noinspection PyMethodOverriding
     def checkParameterValues(self, parameters, context):
         # noinspection PyArgumentList
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
@@ -166,11 +168,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             raise QgsProcessingException(
                 f"La connexion {connection_name} n'existe pas."
             )
-
-        # table = [t for t in connection.tables(schema_openads) if t.tableName() == table_name][0]
-        # tables = connection.tablesInt(schema_openads)
-        # TODO faire la vérif openads
-
+        # TODO faire la vérification
         return super().checkParameterValues(parameters, context)
 
     # noinspection PyMethodOverriding
@@ -183,6 +181,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             parameters, self.SCHEMA_OPENADS, context
         )
 
+        # noinspection PyArgumentList
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         # noinspection PyTypeChecker
         connection = metadata.findConnection(connection_name)
@@ -206,7 +205,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         connection.executeSql("BEGIN;")
 
         existing_constraints = self.existing_constraints_in_database(
-            connection, schema_openads
+            connection, schema_openads, group, sub_group
         )
 
         if feedback.isCanceled():
@@ -249,13 +248,25 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             QgsCoordinateReferenceSystem(f"EPSG:{crs}"),
         )
 
+        layer = self.split_layer_constraints(
+            context, feedback, layer, connection, schema_openads
+        )
+
         if feedback.isCanceled():
             connection.executeSql("ROLLBACK;")
             return {self.COUNT_FEATURES: 0, self.COUNT_NEW_CONSTRAINTS: 0}
 
         feedback.pushInfo("Insertion des geo-contraintes dans la base de données")
         success = self.import_new_geo_constraints(
-            connection, feedback, label_field, layer, schema_openads, text_field, crs
+            connection,
+            feedback,
+            label_field,
+            layer,
+            schema_openads,
+            text_field,
+            crs,
+            group,
+            sub_group,
         )
 
         if feedback.isCanceled():
@@ -264,12 +275,69 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
 
         connection.executeSql("COMMIT;")
         feedback.pushInfo(
-            f"{success} nouvelles geo-contraintes dans la base de données"
+            f"{success} nouvelles géo-contraintes dans la base de données"
         )
         return {
             self.COUNT_FEATURES: success,
             self.COUNT_NEW_CONSTRAINTS: len(missing_in_db),
         }
+
+    @sql_error_handler
+    def split_layer_constraints(
+        self,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+        layer: QgsVectorLayer,
+        connection: QgsAbstractDatabaseProviderConnection,
+        schema: str,
+    ) -> Union[QgsVectorLayer, None]:
+        """Make the union between constraints and municipalities."""
+
+        uri = QgsDataSourceUri(connection.uri())
+        uri.setSchema(schema)
+        uri.setTable("communes")
+        uri.setKeyColumn("id_communes")
+        uri.setGeometryColumn("geom")
+        municipalities = QgsVectorLayer(uri.uri(), "communes", "postgres")
+
+        feedback.pushInfo("Intersection des contraintes avec les communes")
+        params = {
+            "INPUT": layer,
+            "OVERLAY": municipalities,
+            "OVERLAY_FIELDS_PREFIX": "communes_",
+            "OUTPUT": "memory:",
+        }
+
+        # noinspection PyUnresolvedReferences
+        result = processing.run(
+            "native:union",
+            params,
+            context=context,
+            feedback=feedback,
+            is_child_algorithm=True,
+        )
+
+        if feedback.isCanceled():
+            return
+
+        feedback.pushInfo("Transformation de multi vers unique de la nouvelle couche")
+        # noinspection PyUnresolvedReferences
+        result = processing.run(
+            "native:multiparttosingleparts",
+            {
+                "INPUT": result["OUTPUT"],
+                "OUTPUT": "memory:",
+            },
+            context=context,
+            feedback=feedback,
+            is_child_algorithm=True,
+        )
+
+        if feedback.isCanceled():
+            return
+
+        layer = QgsProcessingUtils.mapLayerFromString(result["OUTPUT"], context, True)
+        return layer
 
     @sql_error_handler
     def import_new_geo_constraints(
@@ -281,31 +349,44 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         schema: str,
         text_field: str,
         crs: str,
+        group: str,
+        sub_group: str,
     ) -> int:
         """Import in the database new geo-constraints."""
+        feedback.pushInfo("Insertion des géo-contraintes dans le base de données")
         success = 0
+        fail = 0
         for feature in layer.getFeatures():
-
             content_label = self.clean_value(feature.attribute(label_field))
             content_text = self.clean_value(feature.attribute(text_field))
+            insee_code = self.clean_value(feature.attribute("communes_codeinsee"))
 
+            if insee_code == "":
+                feedback.pushDebugInfo(
+                    f"Omission de l'entité {feature.id()} car elle n'a pas de code INSEE."
+                )
+                fail += 1
+                continue
+
+            # noinspection PyArgumentList
             sql = (
-                f"SELECT id_contraintes, codeinsee "
+                f"SELECT id_contraintes "
                 f"FROM "
-                f"{schema}.contraintes, "
-                f"{schema}.communes "
+                f"{schema}.contraintes "
                 f"WHERE "
-                f"ST_INTERSECTS(ST_GeomFromText('{feature.geometry().asWkt()}', '{crs}'), communes.geom) "
-                f"AND libelle = {QgsExpression.quotedString(content_label)} "
-                f"AND texte = {QgsExpression.quotedString(content_text)};"
+                f"libelle = {QgsExpression.quotedString(content_label)} "
+                f"AND texte = {QgsExpression.quotedString(content_text)}"
+                f"AND groupe = {QgsExpression.quotedString(group)} "
+                f"AND sous_groupe = {QgsExpression.quotedString(sub_group)};"
             )
             # feedback.pushDebugInfo(sql)
             result = connection.executeSql(sql)
             if len(result) == 0:
+                # This case shouldn't happen ... it's covered before
                 feedback.reportError(
-                    f"Omission de l'entité {feature.id()} car soit il n'y a pas de contrainte dans la base "
-                    f"ou l'entité n'intersecte pas la table commune"
+                    f"Omission de l'entité {feature.id()} car elle n'y a pas de contrainte dans la base"
                 )
+                fail += 1
             else:
                 # Useless, but better to check
                 ids = [str(v[0]) for v in result]
@@ -313,23 +394,18 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
                     feedback.reportError(
                         f"Erreur, il y a plusieurs identifiants lors de l'exécution : {sql}"
                     )
+                    fail += 1
                     continue
                 else:
                     ids = ids[0]
 
-                if len(result) >= 2:
-                    insee = ",".join([str(v[1]) for v in result])
-                    feedback.pushDebugInfo(
-                        f"L'entité {feature.id()} intersecte plusieurs communes : {insee}"
-                    )
-                else:
-                    insee = result[0][1]
+                # noinspection PyArgumentList
                 sql = (
                     f"INSERT INTO {schema}.geo_contraintes (id_contraintes, texte, codeinsee, geom) "
                     f"VALUES ("
                     f"'{ids}', "
                     f"{QgsExpression.quotedString(content_text)}, "
-                    f"'{insee}', "
+                    f"'{insee_code}', "
                     f"ST_GeomFromText('{feature.geometry().asWkt()}', '{crs}')"
                     f") RETURNING id_geo_contraintes;"
                 )
@@ -339,6 +415,12 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
                     f"    Insertion source ID {feature.id()} → ID {result[0][0]}"
                 )
                 success += 1
+
+        if fail > 0:
+            feedback.reportError(
+                f"Veuillez lire logs ci-dessus, car il y a {fail} entités en défaut."
+            )
+
         return success
 
     @classmethod
@@ -358,7 +440,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
     ) -> str:
         """The current CRS in the database"""
         # Let's do it on communes
-        # QGIS doesn't manage well if geometry_columns is not the path anyway
+        # QGIS doesn't manage well if geometry_columns is not the search_path anyway
         sql = (
             f"SELECT srid FROM public.geometry_columns "
             f"WHERE f_table_schema = '{schema}' AND f_table_name = 'communes';"
@@ -370,7 +452,10 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
 
     @staticmethod
     def existing_constraints_in_database(
-        connection: QgsAbstractDatabaseProviderConnection, schema_openads: str
+        connection: QgsAbstractDatabaseProviderConnection,
+        schema_openads: str,
+        group: str,
+        sub_group: str,
     ):
         """Return the list of existing constraints in database."""
         # annotation dict[str, Tuple[str, str]], Python 3.9
@@ -380,9 +465,13 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         uri.setKeyColumn("id_contraintes")
         existing_constraints = {}
         existing_constraints_layer = QgsVectorLayer(
-            uri.uri(), "constraintes", "postgres"
+            uri.uri(), "constraints", "postgres"
         )
-        for feature in existing_constraints_layer.getFeatures():
+        request = QgsFeatureRequest()
+        request.setFilterExpression(
+            f"\"groupe\" = '{group}' AND  \"sous_groupe\" = '{sub_group}'"
+        )
+        for feature in existing_constraints_layer.getFeatures(request):
             existing_constraints[feature.attribute("id_contraintes")] = (
                 feature.attribute("libelle"),
                 feature.attribute("texte"),
@@ -398,12 +487,13 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         group: str,
         missing_in_db: List[Tuple[str, str]],
         schema_openads: str,
-        sub_group,
+        sub_group: str,
     ):
         """Insert new constraints in the database and return the list of new IDs."""
         # annotation dict[str, Tuple[str, str]] Python 3.9
         for new in missing_in_db:
             # Quicker, to get the constraint_id with raw SQL query
+            # noinspection PyArgumentList
             sql = (
                 f"INSERT INTO {schema_openads}.contraintes (libelle, texte, groupe, sous_groupe) "
                 f"VALUES ("
