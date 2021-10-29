@@ -8,7 +8,7 @@ hide:
 ## Base de données
 
 
-### Installation de la structure sur la base de données
+### Installation de la base de données
 
 Création de la structure de la base données.
 
@@ -19,6 +19,7 @@ Création de la structure de la base données.
 | ID | Description | Type | Info | Required | Advanced | Option |
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 CONNECTION_NAME|Connexion PostgreSQL vers la base de données|ProviderConnection|Nom de la connexion dans QGIS pour se connecter à la base de données|✓|||
+CRS|Projection|Crs||✓||Default: EPSG:2154 <br> |
 OVERRIDE|Écraser le schéma openads ? ** ATTENTION ** Cela supprimera toutes les données !|Boolean||✓|||
 
 
@@ -35,7 +36,7 @@ DATABASE_VERSION|Version de la base de données|String||
 ## Import des données
 
 
-### Mise en place des données sur les communes
+### Import des communes
 
 Ajout des données pour la table communes
 
@@ -63,7 +64,37 @@ OUTPUT MSG|Message de sortie|String||
 ***
 
 
-### Mise en place des données sur les parcelles
+### Import des contraintes
+
+Ajout des données pour les tables des contraintes
+
+![algo_id](./openads-data_constraints.jpg)
+
+#### Parameters
+
+| ID | Description | Type | Info | Required | Advanced | Option |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+ENTREE|Couche en entrée pour les contraintes|FeatureSource|Couche vecteur qu'il faut importer dans la base de données|✓|||
+CHAMP_ETIQUETTE|Champ des étiquettes|Field|Champ des étiquettes pour la contrainte|✓|||
+CHAMP_TEXTE|Champ texte|Field|Champ texte pour la contrainte|✓|||
+VALEUR_GROUPE|Valeur pour le groupe|String|Zonage, Contraintes, Servitudes, Droit de Préemption, Lotissement, ou tout autre valeur libre|✓|||
+VALEUR_SOUS_GROUPE|Valeur pour le sous-groupe|String|Valeur libre||||
+CONNECTION_NAME|Connexion PostgreSQL vers la base de données|ProviderConnection|Base de données de destination|✓|||
+SCHEMA_OPENADS|Schéma openADS|DatabaseSchema|Nom du schéma des données openADS|✓||Default: openads <br> |
+
+
+#### Outputs
+
+| ID | Description | Type | Info |
+|:-:|:-:|:-:|:-:|
+COUNT_FEATURES|Nombre d'entités importés|Number||
+COUNT_NEW_CONSTRAINTS|Nombre de nouvelles contraintes|Number||
+
+
+***
+
+
+### Import des parcelles
 
 Ajout des données pour la table parcelles
 
@@ -78,6 +109,31 @@ SCHEMA_CADASTRE|Schéma Cadastre|DatabaseSchema|Nom du schéma des données cada
 SCHEMA_OPENADS|Schéma openADS|DatabaseSchema|Nom du schéma des données openADS|✓||Default: openads <br> |
 TRUNCATE_PARCELLES|Mise à jour de la table parcelles|Boolean||✓|||
 IMPORT_PROJECT_LAYER|Importer la couche dans le projet|Boolean||✓|||
+
+
+#### Outputs
+
+| ID | Description | Type | Info |
+|:-:|:-:|:-:|:-:|
+OUTPUT|Couches de sortie|MultipleLayers||
+OUTPUT MSG|Message de sortie|String||
+
+
+***
+
+
+### Chargement des couches depuis la base
+
+Charger toutes les couches de la base de données.
+
+![algo_id](./openads-load_layers.jpg)
+
+#### Parameters
+
+| ID | Description | Type | Info | Required | Advanced | Option |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+CONNECTION_NAME|Connexion PostgreSQL vers la base de données|ProviderConnection|Base de données de destination|✓|||
+SCHEMA|Schéma|DatabaseSchema|Nom du schéma des données openads|✓||Default: openads <br> |
 
 
 #### Outputs
