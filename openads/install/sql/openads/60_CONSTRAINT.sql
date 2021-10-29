@@ -51,7 +51,7 @@ ALTER TABLE ONLY openads.parcelles
 
 -- geo_contraintes geo_contraintes_fkey
 ALTER TABLE ONLY openads.geo_contraintes
-    ADD CONSTRAINT geo_contraintes_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes);
+    ADD CONSTRAINT geo_contraintes_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes) ON DELETE CASCADE;
 
 -- communes communes_codeinsee_unique
 ALTER TABLE ONLY openads.communes

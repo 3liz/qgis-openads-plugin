@@ -28,7 +28,7 @@ CREATE TABLE openads.communes (
     ccodep text,
     codcomm text,
     nom text,
-    codeinsee character(5),
+    codeinsee character(5) NOT NULL,
     created_user text,
     created_date date,
     last_edited_user text,
@@ -64,9 +64,9 @@ CREATE TABLE openads.contraintes (
 -- geo_contraintes
 CREATE TABLE openads.geo_contraintes (
     id_geo_contraintes integer NOT NULL,
-    id_contraintes integer,
+    id_contraintes integer NOT NULL,
     texte text,
-    codeinsee character(5),
+    codeinsee character(5) NOT NULL,
     geom public.geometry(Polygon,2154)
 );
 
@@ -102,7 +102,7 @@ ALTER SEQUENCE openads.contraintes_id_contraintes_seq OWNED BY openads.contraint
 -- dossiers_openads
 CREATE TABLE openads.dossiers_openads (
     id_dossiers_openads integer NOT NULL,
-    codeinsee character(5),
+    codeinsee character(5) NOT NULL,
     numero text,
     parcelles text[],
     x double precision,
@@ -129,7 +129,7 @@ ALTER SEQUENCE openads.dossiers_openads_id_dossiers_openads_seq OWNED BY openads
 -- dossiers_sig
 CREATE TABLE openads.dossiers_sig (
     id_dossiers_sig integer NOT NULL,
-    codeinsee character(5),
+    codeinsee character(5) NOT NULL,
     numero text,
     parcelles text[],
     dossier_importe_geosig boolean,
