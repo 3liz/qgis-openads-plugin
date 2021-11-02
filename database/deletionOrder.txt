@@ -1,0 +1,7 @@
+qgis_plugin
+parcelles
+dossiers_sig
+dossiers_openads
+communes
+geo_contraintes
+contraintes
