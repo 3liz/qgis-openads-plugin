@@ -2,6 +2,7 @@ site_name: openADS
 site_author: 3Liz
 site_description: Extension QGIS pour une base de données openADS
 site_url: http://packages.3liz.org/private/openads/
+repo_url: https://github.com/3liz/qgis-openads-plugin/
 copyright: '<span class="copyleft">&copy;</span> 3Liz'
 
 docs_dir: docs
