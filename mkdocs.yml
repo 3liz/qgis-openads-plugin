@@ -10,7 +10,9 @@ site_dir: build
 
 nav:
     - Accueil: index.md
-    - Guide utilisateur: user_guide/README.md
+    - Guide utilisateur:
+        - 'Installation': 'user-guide/installation.md'
+        - 'Configuration': 'user-guide/configuration.md'
     - Traitements: processing/README.md
     - Base de données: database/index.html
     - Changelog: changelog.md

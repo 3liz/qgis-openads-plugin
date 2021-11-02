@@ -5,7 +5,9 @@
 ## Extension QGIS
 
 L'extension dans QGIS permet la gestion de la base de données.
-[Lire la documentation](user_guide/) pour l'installation de la base de données.
+
+Il est nécessaire [d'installer l'extension](./user-guide/installation.md) dans QGIS puis
+[d'installer la base de données](./user-guide/configuration.md).
 
 ## Module Lizmap
 
