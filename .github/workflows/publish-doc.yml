@@ -3,7 +3,7 @@ name: 📖 Documentation
 on:
   push:
     branches:
-      - master
+      - main
     paths:
       - 'CHANGELOG.md'
       - 'CONTRIBUTING.md'
