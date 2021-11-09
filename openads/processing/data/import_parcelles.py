@@ -127,9 +127,23 @@ class ImportParcellesAlg(BaseDataAlgorithm):
             )
 
         if data_update:
-            feedback.pushInfo("# Vide la table openads.parcelles #")
-            sql = """
-                TRUNCATE openads.parcelles RESTART IDENTITY;
+
+            feedback.pushInfo("## Mise à jour des données parcelles ##")
+
+            sql = f"""
+                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,
+                    ccosec,dnupla,geom,ident,ndeb,sdeb,nom,type)
+                    SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom,
+                           p.parcelle AS ident, p.dnvoiri, p.dindic, v.libvoi, v.natvoi
+                    FROM {schema_cadastre}.parcelle p
+                    JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
+                    JOIN {schema_cadastre}.voie v on v.voie = pi.voie
+                ON CONFLICT (ident) DO UPDATE SET
+                    ccocom=EXCLUDED.ccocom, ccodep=EXCLUDED.ccodep,
+                    ccodir=EXCLUDED.ccodir, ccopre=EXCLUDED.ccopre,
+                    ccosec=EXCLUDED.ccosec, dnupla=EXCLUDED.dnupla,
+                    geom=EXCLUDED.geom, ndeb=EXCLUDED.ndeb, sdeb=EXCLUDED.sdeb,
+                    nom=EXCLUDED.nom, type=EXCLUDED.type;
             """
             try:
                 connection.executeSql(sql)
@@ -137,21 +151,15 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                 connection.executeSql("ROLLBACK;")
                 return {self.OUTPUT_MSG: str(e), self.OUTPUT: []}
 
-            feedback.pushInfo("## Mise à jour des données parcelles ##")
-
+            feedback.pushInfo(
+                f"# Suppression des parcelles dans {schema_openads}.parcelle qui n'existent plus #"
+            )
             sql = f"""
-                INSERT INTO {schema_openads}.parcelles (ccocom,ccodep,ccodir,ccopre,
-                ccosec,dnupla,geom,ident,ndeb,sdeb,nom,type)
-                SELECT p.ccocom, p.ccodep, p.ccodir, p.ccopre, p.ccosec, p.dnupla, pi.geom,
-                CASE WHEN ccopre IS NULL THEN
-                    p.ccodep || p.ccodir || p.ccocom || '000' || '0' || p.ccosec || p.dnupla
-                ELSE
-                    p.ccodep || p.ccodir || p.ccocom || p.ccopre || '0' || p.ccosec || p.dnupla
-                END AS ident,
-                p.dnvoiri, p.dindic, v.libvoi, v.natvoi
-                FROM {schema_cadastre}.parcelle p
-                JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
-                JOIN {schema_cadastre}.voie v on v.voie = pi.voie;
+                DELETE FROM {schema_openads}.parcelles
+                WHERE ident NOT IN (
+                    SELECT p.parcelle
+                    FROM cadastre.parcelle p
+                )
             """
             try:
                 connection.executeSql(sql)
