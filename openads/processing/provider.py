@@ -10,19 +10,18 @@ from openads.processing.data.import_constraints import ImportConstraintsAlg
 from openads.processing.data.import_parcelles import ImportParcellesAlg
 from openads.processing.data.load_layers import LoadLayersAlgorithm
 from openads.processing.database.create import CreateDatabaseStructure
+from openads.processing.database.upgrade import UpgradeDatabaseStructure
 from openads.qgis_plugin_tools import resources_path
-
-# from openads.processing.database.upgrade import UpgradeDatabaseStructure
 
 
 class OpenAdsProvider(QgsProcessingProvider):
     def loadAlgorithms(self):
         self.addAlgorithm(CreateDatabaseStructure())
+        self.addAlgorithm(UpgradeDatabaseStructure())
         self.addAlgorithm(ImportConstraintsAlg())
         self.addAlgorithm(ImportCommunesAlg())
         self.addAlgorithm(ImportParcellesAlg())
         self.addAlgorithm(LoadLayersAlgorithm())
-        # self.addAlgorithm(UpgradeDatabaseStructure())
 
     def id(self):  # NOQA: A003
         return "openads"

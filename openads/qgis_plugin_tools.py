@@ -4,6 +4,8 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
+import configparser
+
 from pathlib import Path
 from typing import List
 
@@ -68,3 +70,22 @@ def format_version_integer(version_string: str) -> int:
     Transform "10.9.12" into "100912"
     """
     return int("".join([a.zfill(2) for a in version_string.strip().split(".")]))
+
+
+def version(remove_v_prefix=True) -> str:
+    """Return the version defined in metadata.txt."""
+    v = metadata_config()["general"]["version"]
+    if v.startswith("v") and remove_v_prefix:
+        v = v[1:]
+    return v
+
+
+def metadata_config() -> configparser:
+    """Get the INI config parser for the metadata file.
+    :return: The config parser object.
+    :rtype: ConfigParser
+    """
+    path = plugin_path("metadata.txt")
+    config = configparser.ConfigParser()
+    config.read(path, encoding="utf8")
+    return config
