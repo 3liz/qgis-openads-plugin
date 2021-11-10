@@ -19,14 +19,14 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
+-- communes communes_codeinsee_unique
+ALTER TABLE ONLY openads.communes
+    ADD CONSTRAINT communes_codeinsee_unique UNIQUE (codeinsee);
+
+
 -- communes communes_pkey
 ALTER TABLE ONLY openads.communes
     ADD CONSTRAINT communes_pkey PRIMARY KEY (id_communes);
-
-
--- geo_contraintes geo_contraintes_pkey
-ALTER TABLE ONLY openads.geo_contraintes
-    ADD CONSTRAINT geo_contraintes_pkey PRIMARY KEY (id_geo_contraintes);
 
 
 -- contraintes contraintes_pkey
@@ -34,14 +34,34 @@ ALTER TABLE ONLY openads.contraintes
     ADD CONSTRAINT contraintes_pkey PRIMARY KEY (id_contraintes);
 
 
+-- dossiers_openads dossiers_openads_numero_unique
+ALTER TABLE ONLY openads.dossiers_openads
+    ADD CONSTRAINT dossiers_openads_numero_unique UNIQUE (numero);
+
+
 -- dossiers_openads dossiers_openads_pkey
 ALTER TABLE ONLY openads.dossiers_openads
     ADD CONSTRAINT dossiers_openads_pkey PRIMARY KEY (id_dossiers_openads);
 
 
+-- dossiers_sig dossiers_sig_numero_unique
+ALTER TABLE ONLY openads.dossiers_sig
+    ADD CONSTRAINT dossiers_sig_numero_unique UNIQUE (numero);
+
+
 -- dossiers_sig dossiers_sig_pkey
 ALTER TABLE ONLY openads.dossiers_sig
     ADD CONSTRAINT dossiers_sig_pkey PRIMARY KEY (id_dossiers_sig);
+
+
+-- geo_contraintes geo_contraintes_pkey
+ALTER TABLE ONLY openads.geo_contraintes
+    ADD CONSTRAINT geo_contraintes_pkey PRIMARY KEY (id_geo_contraintes);
+
+
+-- parcelles parcelles_ident_unique
+ALTER TABLE ONLY openads.parcelles
+    ADD CONSTRAINT parcelles_ident_unique UNIQUE (ident);
 
 
 -- parcelles parcelles_pkey
@@ -52,25 +72,6 @@ ALTER TABLE ONLY openads.parcelles
 -- geo_contraintes geo_contraintes_fkey
 ALTER TABLE ONLY openads.geo_contraintes
     ADD CONSTRAINT geo_contraintes_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes) ON DELETE CASCADE;
-
--- communes communes_codeinsee_unique
-ALTER TABLE ONLY openads.communes
-    ADD CONSTRAINT communes_codeinsee_unique UNIQUE (codeinsee);
-
-
--- parcelles parcelles_ident_unique
-ALTER TABLE ONLY openads.parcelles
-    ADD CONSTRAINT parcelles_ident_unique UNIQUE (ident);
-
-
--- parcelles dossiers_sig_numero_unique
-ALTER TABLE ONLY openads.dossiers_sig
-    ADD CONSTRAINT dossiers_sig_numero_unique UNIQUE (numero);
-
-
--- parcelles dossiers_openads_numero_unique
-ALTER TABLE ONLY openads.dossiers_openads
-    ADD CONSTRAINT dossiers_openads_numero_unique UNIQUE (numero);
 
 
 --

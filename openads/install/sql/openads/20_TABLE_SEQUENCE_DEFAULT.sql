@@ -19,8 +19,6 @@ SET row_security = off;
 
 SET default_tablespace = '';
 
-SET default_with_oids = false;
-
 -- communes
 CREATE TABLE openads.communes (
     id_communes integer NOT NULL,
@@ -39,7 +37,6 @@ CREATE TABLE openads.communes (
 
 -- communes_id_communes_seq
 CREATE SEQUENCE openads.communes_id_communes_seq
-
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -61,33 +58,8 @@ CREATE TABLE openads.contraintes (
 );
 
 
--- geo_contraintes
-CREATE TABLE openads.geo_contraintes (
-    id_geo_contraintes integer NOT NULL,
-    id_contraintes integer NOT NULL,
-    texte text,
-    codeinsee character(5) NOT NULL,
-    geom public.geometry(Polygon,2154)
-);
-
-
--- geo_contraintes_id_geo_contraintes_seq
-CREATE SEQUENCE openads.geo_contraintes_id_geo_contraintes_seq
-
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
--- geo_contraintes_id_geo_contraintes_seq
-ALTER SEQUENCE openads.geo_contraintes_id_geo_contraintes_seq OWNED BY openads.geo_contraintes.id_geo_contraintes;
-
-
 -- contraintes_id_contraintes_seq
 CREATE SEQUENCE openads.contraintes_id_contraintes_seq
-
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -114,7 +86,6 @@ CREATE TABLE openads.dossiers_openads (
 
 -- dossiers_openads_id_dossiers_openads_seq
 CREATE SEQUENCE openads.dossiers_openads_id_dossiers_openads_seq
-
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -143,7 +114,6 @@ CREATE TABLE openads.dossiers_sig (
 
 -- dossiers_sig_id_dossiers_sig_seq
 CREATE SEQUENCE openads.dossiers_sig_id_dossiers_sig_seq
-
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -153,6 +123,29 @@ CREATE SEQUENCE openads.dossiers_sig_id_dossiers_sig_seq
 
 -- dossiers_sig_id_dossiers_sig_seq
 ALTER SEQUENCE openads.dossiers_sig_id_dossiers_sig_seq OWNED BY openads.dossiers_sig.id_dossiers_sig;
+
+
+-- geo_contraintes
+CREATE TABLE openads.geo_contraintes (
+    id_geo_contraintes integer NOT NULL,
+    id_contraintes integer NOT NULL,
+    texte text,
+    codeinsee character(5) NOT NULL,
+    geom public.geometry(Polygon,2154)
+);
+
+
+-- geo_contraintes_id_geo_contraintes_seq
+CREATE SEQUENCE openads.geo_contraintes_id_geo_contraintes_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+-- geo_contraintes_id_geo_contraintes_seq
+ALTER SEQUENCE openads.geo_contraintes_id_geo_contraintes_seq OWNED BY openads.geo_contraintes.id_geo_contraintes;
 
 
 -- parcelles
@@ -175,7 +168,6 @@ CREATE TABLE openads.parcelles (
 
 -- parcelles_id_parcelles_seq
 CREATE SEQUENCE openads.parcelles_id_parcelles_seq
-
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -200,12 +192,8 @@ CREATE TABLE openads.qgis_plugin (
 ALTER TABLE ONLY openads.communes ALTER COLUMN id_communes SET DEFAULT nextval('openads.communes_id_communes_seq'::regclass);
 
 
--- contraintes id_contraites
+-- contraintes id_contraintes
 ALTER TABLE ONLY openads.contraintes ALTER COLUMN id_contraintes SET DEFAULT nextval('openads.contraintes_id_contraintes_seq'::regclass);
-
-
--- geo_contraintes id_geo_contraintes
-ALTER TABLE ONLY openads.geo_contraintes ALTER COLUMN id_geo_contraintes SET DEFAULT nextval('openads.geo_contraintes_id_geo_contraintes_seq'::regclass);
 
 
 -- dossiers_openads id_dossiers_openads
@@ -214,6 +202,10 @@ ALTER TABLE ONLY openads.dossiers_openads ALTER COLUMN id_dossiers_openads SET D
 
 -- dossiers_sig id_dossiers_sig
 ALTER TABLE ONLY openads.dossiers_sig ALTER COLUMN id_dossiers_sig SET DEFAULT nextval('openads.dossiers_sig_id_dossiers_sig_seq'::regclass);
+
+
+-- geo_contraintes id_geo_contraintes
+ALTER TABLE ONLY openads.geo_contraintes ALTER COLUMN id_geo_contraintes SET DEFAULT nextval('openads.geo_contraintes_id_geo_contraintes_seq'::regclass);
 
 
 -- parcelles id_parcelles
