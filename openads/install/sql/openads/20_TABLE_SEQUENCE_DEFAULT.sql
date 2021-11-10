@@ -80,7 +80,7 @@ CREATE TABLE openads.dossiers_openads (
     x double precision,
     y double precision,
     dossier_importe_geosig boolean,
-    geom public.geometry(Polygon,2154)
+    geom public.geometry(MultiPolygon,2154)
 );
 
 
@@ -108,7 +108,7 @@ CREATE TABLE openads.dossiers_sig (
     created_date date,
     last_edited_user text,
     last_edited_date date,
-    geom public.geometry(Polygon,2154)
+    geom public.geometry(MultiPolygon,2154)
 );
 
 
