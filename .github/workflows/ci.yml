@@ -11,67 +11,67 @@ on:
   pull_request:
 
 jobs:
-#  unittests:
-#    runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        working-directory: .docker
-#
-#    steps:
-#      - name: Check out repository
-#        uses: actions/checkout@v2
-#        with:
-#          submodules: 'true'
-#
-#      - name: Launching docker-compose
-#        run: ./start.sh with-qgis
-#
-#      - name: Running tests
-#        run: ./exec.sh
+  unittests:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .docker
 
-#  migration:
-#    runs-on: ubuntu-latest
-#    defaults:
-#      run:
-#        working-directory: .docker
-#
-#    steps:
-#      - name: Check out repository
-#        uses: actions/checkout@v2
-#
-#      - name: Launching docker-compose
-#        run: ./start.sh
-#
-#      - name: Running tests
-#        run: ./install_migrate_generate.sh
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+      with:
+        submodules: 'true'
 
-#  flake8:
-#    runs-on: ubuntu-latest
-#    steps:
-#      - name: Setup Python
-#        uses: actions/setup-python@v2
-#        with:
-#          python-version: 3.7
-#          architecture: x64
-#
-#      - name: Checkout
-#        uses: actions/checkout@master
-#
-#      - uses: actions/cache@v2
-#        with:
-#          path: ~/.cache/pip
-#          key: ${{ runner.os }}-pip-${{ hashFiles('requirements/dev.txt') }}
-#          restore-keys: |
-#            ${{ runner.os }}-pip-
-#
-#      - name: Install Python requirements
-#        run: pip install -r requirements/dev.txt
-#
-#      - name: Run flake8
-#        run: flake8 --statistics --show-source
+    - name: Launching docker-compose
+      run: ./start.sh with-qgis
+
+    - name: Running tests
+      run: ./exec_tests.sh
+
+  migration:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: .docker
+
+    steps:
+    - name: Check out repository
+      uses: actions/checkout@v2
+
+    - name: Launching docker-compose
+      run: ./start.sh
+
+    - name: Running tests
+      run: ./install_migrate_generate.sh
+
+  flake8:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Setup Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.7
+        architecture: x64
+
+    - name: Checkout
+      uses: actions/checkout@master
+
+    - uses: actions/cache@v2
+      with:
+        path: ~/.cache/pip
+        key: ${{ runner.os }}-pip-${{ hashFiles('requirements/dev.txt') }}
+        restore-keys: |
+          ${{ runner.os }}-pip-
+
+    - name: Install Python requirements
+      run: pip install -r requirements/dev.txt
+
+    - name: Run flake8
+      run: flake8 --statistics --show-source --ignore=T001,W503 #To ignore runner.py and base.py error
 
   packaging:
-    # needs: [flake8, unittests, migration]
+    needs: [flake8, unittests, migration]
     runs-on: ubuntu-latest
     if: github.repository == '3liz/qgis-openads-plugin' && contains(github.ref, 'refs/tags/')
 
