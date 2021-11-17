@@ -145,8 +145,8 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
             raise QgsProcessingException(str(e))
 
         db_version = None
-        for a in data:
-            db_version = a[0]
+        for row in data:
+            db_version = row[0]
         if not db_version:
             error_message = "Aucune version trouvée dans la base de données !"
             raise QgsProcessingException(error_message)

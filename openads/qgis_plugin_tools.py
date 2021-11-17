@@ -74,10 +74,10 @@ def format_version_integer(version_string: str) -> int:
 
 def version(remove_v_prefix=True) -> str:
     """Return the version defined in metadata.txt."""
-    v = metadata_config()["general"]["version"]
-    if v.startswith("v") and remove_v_prefix:
-        v = v[1:]
-    return v
+    ver = metadata_config()["general"]["version"]
+    if ver.startswith("v") and remove_v_prefix:
+        ver = ver[1:]
+    return ver
 
 
 def metadata_config() -> configparser:
