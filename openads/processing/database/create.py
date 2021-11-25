@@ -156,7 +156,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         plugin_dir = plugin_path()
         plugin_version = pluginMetadata(PLUGIN_NAME, "version")
         dev_version = False
-        run_migration = os.getenv(f"TEST_DATABASE_INSTALL_{SCHEMA.upper()}") is not None
+        run_migration = os.getenv(f"TEST_DATABASE_INSTALL_{SCHEMA.upper()}", False)
         if plugin_version in ("master", "dev") and not run_migration:
             feedback.reportError(
                 "Be careful, running the install on a development branch!"
@@ -233,7 +233,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         connection: QgsAbstractDatabaseProviderConnection,
         dev_version: bool,
         feedback: QgsProcessingFeedback,
-        plugin_version: int,
+        plugin_version: str,
         run_migration: bool,
     ) -> int:
         """Add the plugin version in the metadata table."""

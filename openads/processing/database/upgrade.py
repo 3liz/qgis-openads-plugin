@@ -2,11 +2,13 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-import os
+from typing import List
 
 from qgis.core import (
+    QgsAbstractDatabaseProviderConnection,
     QgsExpressionContextUtils,
     QgsProcessingException,
+    QgsProcessingFeedback,
     QgsProcessingOutputNumber,
     QgsProcessingOutputString,
     QgsProcessingParameterBoolean,
@@ -51,6 +53,7 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
         """Default CRS for the database, without the authority."""
         return "2154"
 
+    # noinspection PyMethodOverriding
     def initAlgorithm(self, config):
 
         connection_name = QgsExpressionContextUtils.globalScope().variable(
@@ -93,7 +96,10 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
             parameters, self.CONNECTION_NAME, context
         )
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
-        connection = metadata.findConnection(connection_name)
+        # noinspection PyTypeChecker
+        connection: QgsAbstractDatabaseProviderConnection = metadata.findConnection(
+            connection_name
+        )
         if not connection:
             raise QgsProcessingException(f"La connexion {connection_name} n'existe pas")
 
@@ -123,7 +129,10 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
         )
 
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
-        connection = metadata.findConnection(connection_name)
+        # noinspection PyTypeChecker
+        connection: QgsAbstractDatabaseProviderConnection = metadata.findConnection(
+            connection_name
+        )
 
         # Check run migration
         run_migrations = self.parameterAsBool(parameters, self.RUN_MIGRATIONS, context)
@@ -191,10 +200,16 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
 
         return {self.OUTPUT_STATUS: 1, self.OUTPUT_STRING: msg}
 
-    def exec_sql(self, feedback, connection, sql_files):
+    def exec_sql(
+        self,
+        feedback: QgsProcessingFeedback,
+        connection: QgsAbstractDatabaseProviderConnection,
+        sql_files: List,
+    ):
+        """Run all migrations on the given connection."""
         # Loop sql files and run SQL code
         for sf in sql_files:
-            sql_file = os.path.join(plugin_path(), f"install/sql/upgrade/{sf}")
+            sql_file = plugin_path().joinpath(f"install/sql/upgrade/{sf}")
             with open(sql_file, "r") as f:
                 sql = f.read()
 
@@ -207,14 +222,17 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
             except QgsProviderConnectionException as e:
                 raise QgsProcessingException(str(e))
 
-            # Add SQL database version in veloroutes.metadata
+            # Add SQL database version in qgis_plugin table
             new_db_version = sf.replace("upgrade_to_", "").replace(".sql", "").strip()
             self.upgrade_database_version(connection, new_db_version)
 
             feedback.pushInfo(f"* {sf} -- OK !")
 
     @staticmethod
-    def upgrade_database_version(connection, plugin_version):
+    def upgrade_database_version(
+        connection: QgsAbstractDatabaseProviderConnection, plugin_version: str
+    ):
+        """Upgrade the database version in the given connection to the plugin version."""
         sql = f"""
             UPDATE {SCHEMA}.qgis_plugin
             SET (version, version_date) = ( '{plugin_version}', now()::timestamp(0));
