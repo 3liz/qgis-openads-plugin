@@ -470,6 +470,13 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#base-de-donnees" class="md-nav__link">
+    Base de données
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -510,6 +517,15 @@ ou alors avec un QGIS/Postgis local</p>
 pytest
 </code></pre></div>
 </td></tr></table>
+<h2 id="base-de-donnees">Base de données<a class="headerlink" href="#base-de-donnees" title="Permanent link">#</a></h2>
+<p>Sur une nouvelle base de données, si vous souhaitez installer la base de données avec les migrations :</p>
+<table class="highlighttable"><tr><td class="linenos"><div class="linenodiv"><pre><span></span><span class="normal">1</span>
+<span class="normal">2</span>
+<span class="normal">3</span></pre></div></td><td class="code"><div class="highlight"><pre><span></span><code><span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_DATABASE_INSTALL_OPENADS&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="s1">&#39;0.1.0&#39;</span>  <span class="c1"># Enable</span>
+<span class="k">del</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s1">&#39;TEST_DATABASE_INSTALL_OPENADS&#39;</span><span class="p">]</span>  <span class="c1"># Disable</span>
+</code></pre></div>
+</td></tr></table>
                 
                   
                     
@@ -518,7 +534,7 @@ pytest
 <div class="md-source-date">
   <small>
     
-      Dernière mise à jour: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 2, 2021</span>
+      Dernière mise à jour: <span class="git-revision-date-localized-plugin git-revision-date-localized-plugin-date">November 25, 2021</span>
       
     
   </small>
