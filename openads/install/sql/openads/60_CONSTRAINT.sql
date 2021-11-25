@@ -69,6 +69,11 @@ ALTER TABLE ONLY openads.parcelles
     ADD CONSTRAINT parcelles_pkey PRIMARY KEY (id_parcelles);
 
 
+-- qgis_plugin qgis_plugin_pkey
+ALTER TABLE ONLY openads.qgis_plugin
+    ADD CONSTRAINT qgis_plugin_pkey PRIMARY KEY (id);
+
+
 -- geo_contraintes geo_contraintes_fkey
 ALTER TABLE ONLY openads.geo_contraintes
     ADD CONSTRAINT geo_contraintes_fkey FOREIGN KEY (id_contraintes) REFERENCES openads.contraintes(id_contraintes) ON DELETE CASCADE;
