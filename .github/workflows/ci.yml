@@ -68,7 +68,7 @@ jobs:
       run: pip install -r requirements/dev.txt
 
     - name: Run flake8
-      run: flake8 --statistics --show-source --ignore=T001,W503 #To ignore runner.py and base.py error
+      run: flake8 --statistics --show-source
 
   packaging:
     needs: [flake8, unittests, migration]
