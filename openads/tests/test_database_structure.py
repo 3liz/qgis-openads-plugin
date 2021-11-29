@@ -23,7 +23,6 @@ SCHEMA = "openads"
 TABLES = (
     "communes",
     "dossiers_openads",
-    "dossiers_sig",
     "geo_contraintes",
     "parcelles",
     "contraintes",

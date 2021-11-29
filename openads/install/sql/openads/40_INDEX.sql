@@ -27,10 +27,6 @@ CREATE INDEX communes_index_geom_gist ON openads.communes USING gist (geom);
 CREATE INDEX dossiers_openads_index_geom_gist ON openads.dossiers_openads USING gist (geom);
 
 
--- dossiers_sig_index_geom_gist
-CREATE INDEX dossiers_sig_index_geom_gist ON openads.dossiers_sig USING gist (geom);
-
-
 -- geo_contraintes_id_contraintes_idx
 CREATE INDEX geo_contraintes_id_contraintes_idx ON openads.geo_contraintes USING btree (id_contraintes);
 

@@ -44,16 +44,6 @@ ALTER TABLE ONLY openads.dossiers_openads
     ADD CONSTRAINT dossiers_openads_pkey PRIMARY KEY (id_dossiers_openads);
 
 
--- dossiers_sig dossiers_sig_numero_unique
-ALTER TABLE ONLY openads.dossiers_sig
-    ADD CONSTRAINT dossiers_sig_numero_unique UNIQUE (numero);
-
-
--- dossiers_sig dossiers_sig_pkey
-ALTER TABLE ONLY openads.dossiers_sig
-    ADD CONSTRAINT dossiers_sig_pkey PRIMARY KEY (id_dossiers_sig);
-
-
 -- geo_contraintes geo_contraintes_pkey
 ALTER TABLE ONLY openads.geo_contraintes
     ADD CONSTRAINT geo_contraintes_pkey PRIMARY KEY (id_geo_contraintes);

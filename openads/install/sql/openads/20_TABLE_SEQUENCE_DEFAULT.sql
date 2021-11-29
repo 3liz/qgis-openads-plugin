@@ -99,34 +99,6 @@ CREATE SEQUENCE openads.dossiers_openads_id_dossiers_openads_seq
 ALTER SEQUENCE openads.dossiers_openads_id_dossiers_openads_seq OWNED BY openads.dossiers_openads.id_dossiers_openads;
 
 
--- dossiers_sig
-CREATE TABLE openads.dossiers_sig (
-    id_dossiers_sig integer NOT NULL,
-    codeinsee character(5) NOT NULL,
-    numero text,
-    parcelles text[],
-    dossier_importe_geosig boolean,
-    created_user text,
-    created_date date,
-    last_edited_user text,
-    last_edited_date date,
-    geom public.geometry(MultiPolygon,2154)
-);
-
-
--- dossiers_sig_id_dossiers_sig_seq
-CREATE SEQUENCE openads.dossiers_sig_id_dossiers_sig_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
--- dossiers_sig_id_dossiers_sig_seq
-ALTER SEQUENCE openads.dossiers_sig_id_dossiers_sig_seq OWNED BY openads.dossiers_sig.id_dossiers_sig;
-
-
 -- geo_contraintes
 CREATE TABLE openads.geo_contraintes (
     id_geo_contraintes integer NOT NULL,
@@ -200,10 +172,6 @@ ALTER TABLE ONLY openads.contraintes ALTER COLUMN id_contraintes SET DEFAULT nex
 
 -- dossiers_openads id_dossiers_openads
 ALTER TABLE ONLY openads.dossiers_openads ALTER COLUMN id_dossiers_openads SET DEFAULT nextval('openads.dossiers_openads_id_dossiers_openads_seq'::regclass);
-
-
--- dossiers_sig id_dossiers_sig
-ALTER TABLE ONLY openads.dossiers_sig ALTER COLUMN id_dossiers_sig SET DEFAULT nextval('openads.dossiers_sig_id_dossiers_sig_seq'::regclass);
 
 
 -- geo_contraintes id_geo_contraintes

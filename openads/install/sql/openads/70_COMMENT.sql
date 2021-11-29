@@ -29,10 +29,6 @@ COMMENT ON TABLE openads.contraintes IS 'Permet de récupérer les contraintes p
 COMMENT ON TABLE openads.dossiers_openads IS 'Stocke les dossiers créés automatiquement par openADS associés à une liste de parcelles, une emprise et un centroïde';
 
 
--- dossiers_sig
-COMMENT ON TABLE openads.dossiers_sig IS 'Stocke les dossiers spécifiques au SIG, notamment ceux dessinés à la main par les utilisateurs';
-
-
 -- geo_contraintes
 COMMENT ON TABLE openads.geo_contraintes IS 'Complémentaire pour les contraintes avec la géométrie';
 
