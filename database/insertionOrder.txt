@@ -2,6 +2,5 @@ contraintes
 geo_contraintes
 communes
 dossiers_openads
-dossiers_sig
 parcelles
 qgis_plugin
