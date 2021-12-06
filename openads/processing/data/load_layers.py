@@ -5,6 +5,7 @@ __email__ = "info@3liz.org"
 from typing import Dict
 
 from qgis.core import (
+    QgsAbstractDatabaseProviderConnection,
     QgsExpressionContextUtils,
     QgsProcessingContext,
     QgsProcessingFeedback,
@@ -25,6 +26,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
 
     CONNECTION_NAME = "CONNECTION_NAME"
     SCHEMA = "SCHEMA"
+    URL_ADS = "URL_ADS"
     OUTPUT = "OUTPUT"
     OUTPUT_MSG = "OUTPUT MSG"
 
@@ -40,34 +42,29 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
     def initAlgorithm(self, config: Dict):
         # INPUTS
         # Database connection parameters
-        label = "Connexion PostgreSQL vers la base de données"
-        tooltip = "Base de données de destination"
         default = QgsExpressionContextUtils.globalScope().variable(
             "openads_connection_name"
         )
         # noinspection PyArgumentList
         param = QgsProcessingParameterProviderConnection(
             self.CONNECTION_NAME,
-            label,
+            "Connexion PostgreSQL vers la base de données",
             "postgres",
             optional=False,
             defaultValue=default,
         )
-        param.setHelp(tooltip)
+        param.setHelp("Base de données de destination")
         self.addParameter(param)
 
-        label = "Schéma"
-        tooltip = "Nom du schéma des données openads"
-        default = "openads"
         # noinspection PyArgumentList
         param = QgsProcessingParameterDatabaseSchema(
             self.SCHEMA,
-            label,
+            "Schéma",
             self.CONNECTION_NAME,
-            defaultValue=default,
+            defaultValue="openads",
             optional=False,
         )
-        param.setHelp(tooltip)
+        param.setHelp("Nom du schéma des données openads")
         self.addParameter(param)
 
         # OUTPUTS
@@ -91,6 +88,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
 
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection = metadata.findConnection(connection_name)
+        connection: QgsAbstractDatabaseProviderConnection
         result_msg, uri = self.get_uri(connection)
         feedback.pushInfo(result_msg)
 
