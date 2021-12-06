@@ -26,22 +26,22 @@ from openads.tests.base import TestCasePlugin
 
 
 class MyFeedBack(QgsProcessingFeedback):
-    def setProgressText(self, text):
+    def setProgressText(self, text: str):
         print(text)
 
-    def pushInfo(self, info):
+    def pushInfo(self, info: str):
         print(info)
 
-    def pushCommandInfo(self, info):
+    def pushCommandInfo(self, info: str):
         print(info)
 
-    def pushDebugInfo(self, info):
+    def pushDebugInfo(self, info: str):
         print(info)
 
-    def pushConsoleInfo(self, info):
+    def pushConsoleInfo(self, info: str):
         print(info)
 
-    def reportError(self, error, fatalError=False):
+    def reportError(self, error: str, fatalError: bool = False):
         print(error)
 
 

@@ -12,7 +12,7 @@ class TestCasePlugin(TestCase):
     qgs = None
 
     @classmethod
-    def setUpClass(cls):
+    def setUpClass(cls) -> None:
         from qgis.utils import iface
 
         if not iface:
@@ -23,6 +23,6 @@ class TestCasePlugin(TestCase):
             cls.qgs = None
 
     @classmethod
-    def tearDownClass(cls):
+    def tearDownClass(cls) -> None:
         if cls.qgs:
             cls.qgs.exitQgis()

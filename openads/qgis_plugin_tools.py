@@ -7,7 +7,7 @@ __email__ = "info@3liz.org"
 import configparser
 
 from pathlib import Path
-from typing import List
+from typing import Dict, List
 
 from qgis.PyQt import uic
 
@@ -56,7 +56,7 @@ def available_migrations(minimum_version: int) -> List[str]:
         if current_version > minimum_version:
             files.append([current_version, sql_file.name])
 
-    def get_key(item):
+    def get_key(item: Dict):
         return item[0]
 
     sql_files = sorted(files, key=get_key)
@@ -72,7 +72,7 @@ def format_version_integer(version_string: str) -> int:
     return int("".join([a.zfill(2) for a in version_string.strip().split(".")]))
 
 
-def version(remove_v_prefix=True) -> str:
+def version(remove_v_prefix: bool = True) -> str:
     """Return the version defined in metadata.txt."""
     ver = metadata_config()["general"]["version"]
     if ver.startswith("v") and remove_v_prefix:

@@ -2,9 +2,12 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
+from typing import Dict
 
 from qgis.core import (
     QgsExpressionContextUtils,
+    QgsProcessingContext,
+    QgsProcessingFeedback,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
     QgsProcessingParameterDatabaseSchema,
@@ -34,7 +37,7 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
     def shortHelpString(self):
         return "Charger toutes les couches de la base de données."
 
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config: Dict):
         # INPUTS
         # Database connection parameters
         label = "Connexion PostgreSQL vers la base de données"
@@ -74,7 +77,12 @@ class LoadLayersAlgorithm(BaseDataAlgorithm):
 
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self,
+        parameters: Dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+    ):
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
         )

@@ -2,7 +2,7 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-from typing import List, Tuple, Union
+from typing import Callable, Dict, List, Tuple, Union
 
 from qgis import processing
 from qgis.core import (
@@ -33,7 +33,7 @@ from qgis.PyQt.QtCore import NULL
 from openads.processing.data.base import BaseDataAlgorithm
 
 
-def sql_error_handler(func):
+def sql_error_handler(func: Callable):
     """Decorator to catch sql exceptions."""
 
     def inner_function(*args, **kwargs):
@@ -71,7 +71,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         return "Ajout des données pour les tables des contraintes"
 
     # noinspection PyMethodOverriding
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config: Dict):
         # noinspection PyUnresolvedReferences
         param = QgsProcessingParameterFeatureSource(
             self.INPUT,
@@ -152,7 +152,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         )
 
     # noinspection PyMethodOverriding
-    def checkParameterValues(self, parameters, context):
+    def checkParameterValues(self, parameters: Dict, context: QgsProcessingContext):
         # noinspection PyArgumentList
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
@@ -172,7 +172,12 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         return super().checkParameterValues(parameters, context)
 
     # noinspection PyMethodOverriding
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self,
+        parameters: Dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+    ):
         # noinspection PyArgumentList
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
@@ -482,7 +487,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
     @sql_error_handler
     def insert_new_constraints(
         connection: QgsAbstractDatabaseProviderConnection,
-        existing_constraints,
+        existing_constraints: Dict,
         feedback: QgsProcessingFeedback,
         group: str,
         missing_in_db: List[Tuple[str, str]],

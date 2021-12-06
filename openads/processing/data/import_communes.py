@@ -2,10 +2,13 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
+from typing import Dict
 
 from qgis.core import (
     QgsExpressionContextUtils,
+    QgsProcessingContext,
     QgsProcessingException,
+    QgsProcessingFeedback,
     QgsProcessingOutputMultipleLayers,
     QgsProcessingOutputString,
     QgsProcessingParameterBoolean,
@@ -40,7 +43,7 @@ class ImportCommunesAlg(BaseDataAlgorithm):
     def shortHelpString(self):
         return "Ajout des données pour la table communes"
 
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config: Dict):
         # INPUTS
         # Database connection parameters
         label = "Connexion PostgreSQL vers la base de données"
@@ -106,7 +109,12 @@ class ImportCommunesAlg(BaseDataAlgorithm):
 
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_MSG, "Message de sortie"))
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self,
+        parameters: Dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+    ):
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context

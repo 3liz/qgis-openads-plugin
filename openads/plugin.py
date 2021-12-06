@@ -40,7 +40,7 @@ class OpenAdsPlugin:
         iface.pluginHelpMenu().addAction(self.help_action)
         self.help_action.triggered.connect(self.open_help)
 
-    def unload(self):
+    def unload(self) -> None:
         """Unload the plugin from QGIS."""
         if self.provider:
             QgsApplication.processingRegistry().removeProvider(self.provider)

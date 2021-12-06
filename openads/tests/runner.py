@@ -8,7 +8,7 @@ import unittest
 from openads.tests.conftest import pytest_report_header
 
 
-def _run_tests(test_suite, package_name, pattern):
+def _run_tests(test_suite: unittest.TestSuite, package_name: str, pattern: str):
     """Core function to test a test suite.
 
     :param test_suite: Unittest test suite
@@ -36,15 +36,13 @@ def _run_tests(test_suite, package_name, pattern):
     print(f"TOTAL                : {results.testsRun}")
 
 
-def test_package(package=None, pattern="test_*.py"):
+def test_package(package: str = None, pattern: str = "test_*.py"):
     """Test package.
     This function is called by CLI without arguments.
 
     :param package: The package to test.
-    :type package: str
 
     :param pattern: The pattern of files to discover.
-    :type pattern: str
     """
     pattern_environment = os.environ.get("TEST_PATTERN")
     if pattern_environment and pattern_environment != "default_pattern":

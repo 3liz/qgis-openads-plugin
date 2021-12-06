@@ -63,7 +63,7 @@ TEMPLATE_PARAMETERS = (
 TEMPLATE_OUTPUT = "{id}|{description}|{type}|{info}|\n"
 
 
-def format_type(class_name):
+def format_type(class_name: str) -> str:
     class_name = class_name.replace("QgsProcessingParameter", "")
     class_name = class_name.replace("QgsProcessingOutput", "")
     return class_name

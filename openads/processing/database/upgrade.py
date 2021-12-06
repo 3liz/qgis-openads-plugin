@@ -2,11 +2,12 @@ __copyright__ = "Copyright 2021, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
-from typing import List
+from typing import Dict, List
 
 from qgis.core import (
     QgsAbstractDatabaseProviderConnection,
     QgsExpressionContextUtils,
+    QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputNumber,
@@ -54,7 +55,7 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
         return "2154"
 
     # noinspection PyMethodOverriding
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config: Dict):
 
         connection_name = QgsExpressionContextUtils.globalScope().variable(
             DEFAULT_CONNECTION_NAME
@@ -91,7 +92,7 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
         self.addOutput(QgsProcessingOutputNumber(self.OUTPUT_STATUS, "Output status"))
         self.addOutput(QgsProcessingOutputString(self.OUTPUT_STRING, "Output message"))
 
-    def checkParameterValues(self, parameters, context):
+    def checkParameterValues(self, parameters: Dict, context: QgsProcessingContext):
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
         )
@@ -123,7 +124,12 @@ class UpgradeDatabaseStructure(BaseDatabaseAlgorithm):
 
         return super().checkParameterValues(parameters, context)
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self,
+        parameters: Dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+    ):
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
         )

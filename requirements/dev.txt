@@ -10,6 +10,8 @@ flake8-pep3101
 flake8-print
 flake8-qgis
 flake8-variables-names
+flake8-qgis
+flake8-annotations
 isort
 pylint
 pytest

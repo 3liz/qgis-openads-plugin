@@ -5,11 +5,13 @@ __email__ = "info@3liz.org"
 import os
 
 from pathlib import Path
+from typing import Dict
 
 from qgis.core import (
     QgsAbstractDatabaseProviderConnection,
     QgsCoordinateReferenceSystem,
     QgsExpressionContextUtils,
+    QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProcessingOutputString,
@@ -58,7 +60,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
         return "2154"
 
     # noinspection PyMethodOverriding
-    def initAlgorithm(self, config):
+    def initAlgorithm(self, config: Dict):
         connection_name = QgsExpressionContextUtils.globalScope().variable(
             DEFAULT_CONNECTION_NAME
         )
@@ -100,7 +102,7 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
             )
         )
 
-    def checkParameterValues(self, parameters, context):
+    def checkParameterValues(self, parameters: Dict, context: QgsProcessingContext):
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
         )
@@ -126,7 +128,12 @@ class CreateDatabaseStructure(BaseDatabaseAlgorithm):
 
         return super().checkParameterValues(parameters, context)
 
-    def processAlgorithm(self, parameters, context, feedback):
+    def processAlgorithm(
+        self,
+        parameters: Dict,
+        context: QgsProcessingContext,
+        feedback: QgsProcessingFeedback,
+    ):
         metadata = QgsProviderRegistry.instance().providerMetadata("postgres")
         connection_name = self.parameterAsConnectionName(
             parameters, self.CONNECTION_NAME, context
