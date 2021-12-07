@@ -17,6 +17,10 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+-- dossiers_openads trg_add_update_dossier_openads
+CREATE TRIGGER trg_add_update_dossier_openads BEFORE INSERT OR UPDATE ON openads.dossiers_openads FOR EACH ROW EXECUTE PROCEDURE openads.ajout_modif_dossier();
+
+
 --
 -- PostgreSQL database dump complete
 --

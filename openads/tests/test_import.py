@@ -22,6 +22,7 @@ from qgis.core import (
     QgsProviderRegistry,
     QgsVectorLayer,
 )
+from qgis.PyQt.QtCore import NULL
 
 from openads.processing.provider import OpenAdsProvider as ProcessingProvider
 from openads.qgis_plugin_tools import plugin_test_data_path
@@ -79,6 +80,77 @@ class TestImport(TestCasePlugin):
             self.connection.dropSchema(SCHEMA, True)
         del self.connection
         time.sleep(1)
+
+    def test_trigger_import_dossier(self):
+        """Test import trigger dossier."""
+        for i in (1, 2, 9):
+            self.connection.executeSql(
+                f"INSERT INTO openads.parcelles (ident, geom) "
+                f"VALUES ({i}, ST_Multi(ST_Buffer(ST_MakePoint({i},{i}), 10)));"
+            )
+
+        result = self.connection.executeSql(
+            "SELECT COUNT(*) AS count, STRING_AGG(\"id_parcelles\"::text, ',') FROM openads.parcelles;"
+        )[0]
+        self.assertEqual(3, result[0])
+        self.assertEqual("1,2,3", result[1])
+
+        count = self.connection.executeSql(
+            "SELECT COUNT(*) FROM openads.dossiers_openads;"
+        )[0][0]
+        self.assertEqual(0, count)
+
+        # Insertion d'un dossier avec des parcelles existantes dans la base
+        self.connection.executeSql(
+            "INSERT INTO openads.dossiers_openads (codeinsee, numero, parcelles) "
+            "VALUES ('25047', '2', array[2]);"
+        )
+        results = self.connection.executeSql("SELECT * FROM openads.dossiers_openads;")
+        self.assertEqual(1, len(results))
+        row = results[0]
+        self.assertEqual(row[0], 1)  # id_dossiers_openads
+        self.assertEqual(row[1], "25047")  # codeinsee
+        self.assertEqual(row[2], "2")  # numéro
+        self.assertEqual(row[3], "{2}")  # parcelles
+        self.assertGreaterEqual(row[4], 1)  # x
+        self.assertGreaterEqual(row[5], 1)  # y
+        self.assertNotEqual(row[7], NULL)  # geom
+        # self.connection.executeSql('TRUNCATE openads.dossiers_openads RESTART IDENTITY;')
+
+        # MAJ du dossier avec une parcelle non existante
+        self.connection.executeSql(
+            "UPDATE openads.dossiers_openads SET parcelles = array[2, 9999] "
+            "WHERE id_dossiers_openads = 1;"
+        )
+        results = self.connection.executeSql("SELECT * FROM openads.dossiers_openads;")
+        self.assertEqual(1, len(results))
+        row = results[0]
+        self.assertEqual(row[0], 1)  # id_dossiers_openads
+        self.assertEqual(row[1], "25047")  # codeinsee
+        self.assertEqual(row[2], "2")  # numéro
+        self.assertEqual(row[3], "{2,9999}")  # parcelles
+        self.assertEqual(row[4], NULL)  # x
+        self.assertEqual(row[5], NULL)  # y
+        self.assertNotEqual(row[7], NULL)  # geom
+        self.connection.executeSql(
+            "TRUNCATE openads.dossiers_openads RESTART IDENTITY;"
+        )
+
+        # Insertion d'un dossier avec des parcelles non existantes dans la base
+        self.connection.executeSql(
+            "INSERT INTO openads.dossiers_openads (codeinsee, numero, parcelles) "
+            "VALUES ('25047', '3', array[9999]);"
+        )
+        results = self.connection.executeSql("SELECT * FROM openads.dossiers_openads;")
+        self.assertEqual(1, len(results))
+        row = results[0]
+        self.assertEqual(row[0], 1)  # id_dossiers_openads
+        self.assertEqual(row[1], "25047")  # codeinsee
+        self.assertEqual(row[2], "3")  # numéro
+        self.assertEqual(row[3], "{9999}")  # parcelles
+        self.assertEqual(row[4], NULL)  # x
+        self.assertEqual(row[5], NULL)  # y
+        self.assertEqual(row[7], NULL)  # geom
 
     def test_import_constraints(self):
         """Test to import constraints in the database."""

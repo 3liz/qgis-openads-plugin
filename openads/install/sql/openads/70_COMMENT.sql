@@ -17,6 +17,10 @@ SET xmloption = content;
 SET client_min_messages = warning;
 SET row_security = off;
 
+-- FUNCTION ajout_modif_dossier()
+COMMENT ON FUNCTION openads.ajout_modif_dossier() IS 'Trigger pour l''ajout ou la modification d''un dossier pour la génération de la géométrie';
+
+
 -- communes
 COMMENT ON TABLE openads.communes IS 'Contient les communes';
 
