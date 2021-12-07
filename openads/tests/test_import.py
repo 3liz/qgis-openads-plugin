@@ -14,6 +14,9 @@ from qgis.core import (
     QgsApplication,
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
+    QgsExpression,
+    QgsProcessingContext,
+    QgsProcessingException,
     QgsProcessingFeedback,
     QgsProject,
     QgsProviderRegistry,
@@ -128,6 +131,44 @@ class TestImport(TestCasePlugin):
         # We have municipalities now
         self.assertEqual(results["COUNT_FEATURES"], 71)
         self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 0)
+
+    def test_load_layers_algorithm(self):
+        """Test load layers algorithm."""
+        params = {
+            "CONNECTION_NAME": os.getenv("TEST_QGIS_CONNEXION_NAME", "test_database"),
+            "SCHEMA": "openads",
+            "URL_ADS": "https://demo.com?param=foo#anchor",
+        }
+        provider = ProcessingProvider()
+        alg = "{}:load_layers".format(provider.id())
+
+        project = QgsProject()
+        variables = project.customVariables()
+        self.assertNotIn("openads_url_ads", list(variables.keys()))
+        context = QgsProcessingContext()
+        context.setProject(project)
+
+        with self.assertRaises(QgsProcessingException):
+            # URL is not correct
+            processing.run(alg, params, context=context)
+
+        params["URL_ADS"] = "https://demo.com"
+
+        results = processing.run(alg, params, context=context)
+
+        variables = project.customVariables()
+        self.assertEqual(variables["openads_url_ads"], "https://demo.com")
+
+        layers = [
+            layer for layer in results["OUTPUT"] if layer.name() == "dossiers_openads"
+        ]
+        layer = layers[0]
+
+        index = layer.fields().indexFromName("lien_openads")
+        self.assertGreaterEqual(index, 0)
+        expression = layer.expressionField(index)
+        self.assertTrue(expression.startswith("@openads_url_ads"))
+        self.assertFalse(QgsExpression(expression).hasParserError())
 
 
 if __name__ == "__main__":
