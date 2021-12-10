@@ -11,4 +11,4 @@ Il est nécessaire [d'installer l'extension](./user-guide/installation.md) dans 
 
 ## Module Lizmap
 
-L'extension est utile pour l'exploitation du module Lizmap openADS.
+L'extension est utile pour l'exploitation du module [Lizmap openADS](https://github.com/3liz/lizmap-openads-module).
