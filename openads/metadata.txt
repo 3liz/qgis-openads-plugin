@@ -1,20 +1,20 @@
 [general]
 name=OpenADS
 qgisMinimumVersion=3.16
-description=Extension openADS
+description=openADS est un logiciel web destiné à l'instruction dématérialisée des dossiers d'urbanisme. Cette extension fonctionne avec le module Lizmap https://github.com/3liz/lizmap-openads-module
 version=master
 changelog=changelog
 author=3Liz
 email=info@3liz.com
 
-about=openADS est un logiciel web destiné à l'instruction dématérialisée des dossiers d'urbanisme.
+about=openADS est un logiciel web destiné à l'instruction dématérialisée des dossiers d'urbanisme. Cette extension fonctionne avec le module Lizmap https://github.com/3liz/lizmap-openads-module
 hasProcessingProvider=yes
 
-tracker=https://projects.3liz.org/
-repository=https://projects.3liz.org/
-tags=foncier,cadastre,urbanisme,france
+tracker=https://github.com/3liz/qgis-openads-plugin/issues
+repository=https://github.com/3liz/qgis-openads-plugin
+tags=foncier,cadastre,urbanisme,france,lizmap
 
-# homepage=
+homepage=https://docs.3liz.org/qgis-openads-plugin/
 category=Analysis
 icon=resources/icons/icon.png
 experimental=False
