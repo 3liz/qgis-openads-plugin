@@ -33,6 +33,32 @@ DATABASE_VERSION|Version de la base de données|String||
 ***
 
 
+### Mise à jour de la base de données
+
+Mise à jour de la structure de la base données.
+
+![algo_id](./openads-upgrade_database_structure.jpg)
+
+#### Parameters
+
+| ID | Description | Type | Info | Required | Advanced | Option |
+|:-:|:-:|:-:|:-:|:-:|:-:|:-:|
+CONNECTION_NAME|Connexion PostgreSQL vers la base de données|ProviderConnection|Nom de la connexion dans QGIS pour se connecter à la base de données|✓|||
+CRS|Projection|Crs||✓||Default: EPSG:2154 <br> |
+RUN_MIGRATIONS|Cocher cette option pour lancer la mise-à-jour.|Boolean||✓|||
+
+
+#### Outputs
+
+| ID | Description | Type | Info |
+|:-:|:-:|:-:|:-:|
+OUTPUT_STATUS|Output status|Number||
+OUTPUT_STRING|Output message|String||
+
+
+***
+
+
 ## Import des données
 
 
@@ -134,6 +160,7 @@ Charger toutes les couches de la base de données.
 |:-:|:-:|:-:|:-:|:-:|:-:|:-:|
 CONNECTION_NAME|Connexion PostgreSQL vers la base de données|ProviderConnection|Base de données de destination|✓|||
 SCHEMA|Schéma|DatabaseSchema|Nom du schéma des données openads|✓||Default: openads <br> |
+URL_ADS|URL du dossier OpenADS|String|L'URL du dossier OpenADS||||
 
 
 #### Outputs
