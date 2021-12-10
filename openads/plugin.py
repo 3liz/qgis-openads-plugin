@@ -11,7 +11,7 @@ from qgis.utils import iface
 from openads.processing.provider import OpenAdsProvider
 from openads.qgis_plugin_tools import resources_path
 
-URL_DOCUMENTATION = "http://packages.3liz.org/private/openads/"
+URL_DOCUMENTATION = "https://docs.3liz.org/qgis-openads-plugin/"
 
 
 class OpenAdsPlugin:

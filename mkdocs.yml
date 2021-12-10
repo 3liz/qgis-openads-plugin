@@ -1,7 +1,7 @@
 site_name: openADS
 site_author: 3Liz
 site_description: Extension QGIS pour une base de données openADS
-site_url: http://packages.3liz.org/private/openads/
+site_url: https://docs.3liz.org/qgis-openads-plugin/
 repo_url: https://github.com/3liz/qgis-openads-plugin/
 copyright: '<span class="copyleft">&copy;</span> 3Liz'
 
@@ -35,6 +35,7 @@ markdown_extensions:
           class: mermaid
           format: !!python/name:pymdownx.superfences.fence_div_format
   - pymdownx.tabbed:
+      alternate_style: true
   - pymdownx.magiclink:
   - pymdownx.tasklist:
   - pymdownx.snippets:
