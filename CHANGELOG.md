@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.9.0 - 2021-12-10
+
 * Ajout d'une variable dans le projet pour spécifier l'URL du projet
 * Ajout d'un champ virtuel sur la couche `dossiers_openads` pour afficher l'URL du projet
 * Ajout d'un trigger pour la gestion de la table `dossier_openads`
