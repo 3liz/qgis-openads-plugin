@@ -1,42 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
-         <loc>http://packages.3liz.org/private/openads/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/CHANGELOG/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/CHANGELOG/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/CONTRIBUTING/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/CONTRIBUTING/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/changelog/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/changelog/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/contributing/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/contributing/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/processing/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/processing/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/user-guide/configuration/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/user-guide/configuration/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
-         <loc>http://packages.3liz.org/private/openads/user-guide/installation/</loc>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/user-guide/installation/</loc>
          <lastmod>2021-12-10</lastmod>
          <changefreq>daily</changefreq>
     </url>
