@@ -114,7 +114,7 @@ class TestImport(TestCasePlugin):
         self.assertEqual(row[3], "{2}")  # parcelles
         self.assertGreaterEqual(row[4], 1)  # x
         self.assertGreaterEqual(row[5], 1)  # y
-        self.assertNotEqual(row[7], NULL)  # geom
+        self.assertNotEqual(row[6], NULL)  # geom
         # self.connection.executeSql('TRUNCATE openads.dossiers_openads RESTART IDENTITY;')
 
         # MAJ du dossier avec une parcelle non existante
@@ -131,7 +131,7 @@ class TestImport(TestCasePlugin):
         self.assertEqual(row[3], "{2,9999}")  # parcelles
         self.assertEqual(row[4], NULL)  # x
         self.assertEqual(row[5], NULL)  # y
-        self.assertNotEqual(row[7], NULL)  # geom
+        self.assertNotEqual(row[6], NULL)  # geom
         self.connection.executeSql(
             "TRUNCATE openads.dossiers_openads RESTART IDENTITY;"
         )
@@ -150,7 +150,7 @@ class TestImport(TestCasePlugin):
         self.assertEqual(row[3], "{9999}")  # parcelles
         self.assertEqual(row[4], NULL)  # x
         self.assertEqual(row[5], NULL)  # y
-        self.assertEqual(row[7], NULL)  # geom
+        self.assertEqual(row[6], NULL)  # geom
 
     def test_import_constraints(self):
         """Test to import constraints in the database."""
