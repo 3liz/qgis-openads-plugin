@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Suppression de la colonne `dossier_importe_geosig` dans la table `dossiers_openads`.
+
 ## 0.9.0 - 2021-12-10
 
 * Ajout d'une variable dans le projet pour spécifier l'URL du projet

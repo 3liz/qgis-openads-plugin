@@ -81,7 +81,6 @@ CREATE TABLE openads.dossiers_openads (
     parcelles text[],
     x double precision,
     y double precision,
-    dossier_importe_geosig boolean,
     geom public.geometry(MultiPolygon,2154)
 );
 
