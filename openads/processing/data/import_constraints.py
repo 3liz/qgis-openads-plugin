@@ -210,16 +210,12 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         connection.executeSql("BEGIN;")
 
         existing_constraints = self.existing_constraints_in_database(
-            connection, schema_openads, group, sub_group
+            connection, schema_openads, group, sub_group, feedback
         )
 
         if feedback.isCanceled():
             connection.executeSql("ROLLBACK;")
             return {self.COUNT_FEATURES: 0, self.COUNT_NEW_CONSTRAINTS: 0}
-
-        feedback.pushInfo(
-            f"Dans la base de données, il y a {len(existing_constraints)} contrainte(s)."
-        )
 
         missing_in_db = list(set(uniques) - set(existing_constraints.values()))
 
@@ -341,6 +337,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         if feedback.isCanceled():
             return
 
+        feedback.pushInfo("Intersection OK des contraintes avec les communes.")
         layer = QgsProcessingUtils.mapLayerFromString(result["OUTPUT"], context, True)
         return layer
 
@@ -358,7 +355,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         sub_group: str,
     ) -> int:
         """Import in the database new geo-constraints."""
-        feedback.pushInfo("Insertion des géo-contraintes dans le base de données")
+        feedback.pushInfo("Insertion des géo-contraintes dans la base de données")
         success = 0
         fail = 0
         for feature in layer.getFeatures():
@@ -461,6 +458,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         schema_openads: str,
         group: str,
         sub_group: str,
+        feedback: QgsProcessingFeedback,
     ):
         """Return the list of existing constraints in database."""
         # annotation dict[str, Tuple[str, str]], Python 3.9
@@ -474,13 +472,17 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         )
         request = QgsFeatureRequest()
         request.setFilterExpression(
-            f"\"groupe\" = '{group}' AND  \"sous_groupe\" = '{sub_group}'"
+            f"\"groupe\" = '{group}' AND \"sous_groupe\" = '{sub_group}'"
         )
         for feature in existing_constraints_layer.getFeatures(request):
             existing_constraints[feature.attribute("id_contraintes")] = (
                 feature.attribute("libelle"),
                 feature.attribute("texte"),
             )
+        feedback.pushInfo(
+            f"Il y a {len(existing_constraints)} contrainte(s) dans la base de données concernant le groupe "
+            f"'{group}' et le sous-groupe '{sub_group}'."
+        )
         return existing_constraints
 
     @staticmethod
@@ -509,7 +511,9 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
                 f"RETURNING id_contraintes;"
             )
             result = connection.executeSql(sql)
-            feedback.pushDebugInfo(f"    Insertion {new} → ID {result[0][0]}")
+            feedback.pushDebugInfo(
+                f"    Insertion dans la table 'contraintes' : {new} → ID {result[0][0]}"
+            )
             existing_constraints[result[0][0]] = (new[0], new[1])
         return existing_constraints
 
@@ -571,6 +575,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             return
 
         layer = QgsProcessingUtils.mapLayerFromString(result["OUTPUT"], context, True)
+        feedback.pushInfo("Les données sont désormais OK pour l'import.")
         return layer
 
     @staticmethod
@@ -584,6 +589,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         request = QgsFeatureRequest()
         request.setSubsetOfAttributes([label_field, text_field], layer.fields())
         uniques = []
+        uniques_str = []
         for feature in layer.getFeatures(request):
 
             content_label = ImportConstraintsAlg.clean_value(
@@ -596,6 +602,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             couple = (content_label, content_text)
             if couple not in uniques:
                 uniques.append(couple)
+                uniques_str.append(str(couple))
 
             if feedback.isCanceled():
                 return []
@@ -603,6 +610,9 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         feedback.pushInfo(
             f"Dans la source, il y a {len(uniques)} couples uniques sur le couple "
             f"'{label_field}' : '{text_field}'"
+        )
+        feedback.pushDebugInfo(
+            f"Liste des couples uniques dans la couche : {','.join(uniques_str)}"
         )
 
         return uniques

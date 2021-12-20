@@ -3,6 +3,7 @@
 ## Unreleased
 
 * Suppression de la colonne `dossier_importe_geosig` dans la table `dossiers_openads`.
+* Relecture des logs lors de l'import des données contraintes.
 
 ## 0.9.0 - 2021-12-10
 
