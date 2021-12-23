@@ -13,6 +13,7 @@ nav:
     - Guide utilisateur:
         - 'Installation': 'user-guide/installation.md'
         - 'Configuration': 'user-guide/configuration.md'
+        - 'Publication': 'user-guide/publication.md'
     - Traitements: processing/README.md
     - Base de données: database/index.html
     - Changelog: changelog.md
