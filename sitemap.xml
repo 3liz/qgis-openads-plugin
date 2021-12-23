@@ -2,42 +2,47 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/CHANGELOG/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/CONTRIBUTING/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/changelog/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/contributing/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/processing/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/user-guide/configuration/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
     <url>
          <loc>https://docs.3liz.org/qgis-openads-plugin/user-guide/installation/</loc>
-         <lastmod>2021-12-20</lastmod>
+         <lastmod>2021-12-23</lastmod>
+         <changefreq>daily</changefreq>
+    </url>
+    <url>
+         <loc>https://docs.3liz.org/qgis-openads-plugin/user-guide/publication/</loc>
+         <lastmod>2021-12-23</lastmod>
          <changefreq>daily</changefreq>
     </url>
 </urlset>
