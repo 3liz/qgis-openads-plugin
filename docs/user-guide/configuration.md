@@ -45,7 +45,7 @@ Ces deux scripts possèdent les mêmes paramètres :
 * Case à cocher de mise à jour de la table obligatoire pour lancer l'import
 * Case à cocher pour importer la couche dans QGIS après la mise à jour de la table
 
-Le troisième script d'import concerne la couche `contraintes`.
+Le troisième script d'import concerne la table `contraintes`.
 
 ![openads_import_contraintes](../processing/openads-data_constraints.jpg)
 
@@ -59,11 +59,13 @@ Il dispose de paramètres supplémentaires aux deux autres :
 * Choix de la connexion à la base de données
 * Choix du schéma des données `openads`
 
+## Chargement des couches depuis la base de données
+
 ### Import des couches dans le projet QGIS
 
 Maintenant que la base de données en place, il y a le script suivant qui permet d'importer toutes
 les couches nécessaires au projet openads. Il importera les couches `communes`, `parcelles`,
-`dossiers_openads` et la couche `contraintes`.
+`dossiers_openads` et la table `contraintes`.
 
 ![openads_import_layer](../processing/openads-load_layers.jpg)
 
