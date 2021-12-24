@@ -24,7 +24,7 @@ Il est nécessaire de publier en WFS les couches **parcelles** et **dossiers_ope
 
 ![Propriétés du projet QGIS - Server](./media/qgis-projets-proprietes-server.jpg)
 
-Il peut-être intéressant de cocher la case `Ajouter la géométrie à l'entité de la réponse` afin d'afficher les géométries associées aux popups lizmap.
+Il peut être intéressant de cocher la case `Ajouter la géométrie à l'entité de la réponse` afin d'afficher les géométries associées aux popups lizmap.
 
 ### Configuration Lizmap
 
@@ -44,13 +44,13 @@ Cette configuration est nécessaire afin de bénéficier de la fonction de **sé
 
 ![Configuration Lizmap - Table attributaire](./media/lizmap-table-attributaire.jpg)
 
-Vous pouvez adapater la configuration en fonction du volume de données publiées.
+Vous pouvez adapter la configuration en fonction du volume de données publiées.
 
 #### Édition de couches
 
-La couche **dossiers_openads** doit-être configurer afin d'être éditable dans Lizmap.
+La couche **dossiers_openads** doit-être configuré afin d'être éditable dans Lizmap.
 
-![Configuration Lizmap - Édition de couhces - dossiers_openads](./media/lizmap-edition-couches-dossiers_openads.jpg)
+![Configuration Lizmap - Édition de couches - dossiers_openads](./media/lizmap-edition-couches-dossiers_openads.jpg)
 
 Cette configuration permettra d'éditer l'emprise d'un dossier.
 
@@ -60,11 +60,12 @@ Cette configuration permettra d'éditer l'emprise d'un dossier.
 Une fois le projet QGIS `openads.qgs` et sa configuration lizmap `openads.qgs.cfg` prête, vous pouvez publier ces fichiers dans un répertoire Lizmap.
 Ce répertoire peut très bien avoir un accès restreint par login et mot de passe.
 
-Si vous avez publier votre projet QGIS `openads.qgs` et sa configuration lizmap `openads.qgs.cfg` dans le dossier `repertoire1` de votre serveur, que
-l'url de votre instance lizmap est `demo.lizmap.com/lizmap` et que ce dossier a été configurer dans le backoffice de lizmap avec l'identifiant `rep1` 
-et le titre `Répertoire principal` alors le projet sera accessible avec l'URL de la forme **demo.lizmap.com/lizmap**/index.php/view/map/?repository=**rep1**&project=openads
+Si vous avez publié votre projet QGIS `openads.qgs` et sa configuration lizmap `openads.qgs.cfg` dans le dossier `repertoire1` de votre serveur, que
+l'URL de votre instance lizmap est `demo.lizmap.com/lizmap` et que ce dossier a été configurer dans le backoffice de lizmap avec l'identifiant `rep1`
+et le titre `Répertoire principal` alors le projet sera accessible avec l'URL de la forme
+**demo.lizmap.com/lizmap**/index.php/view/map/?repository=**rep1**&project=openads
 
-Pour la configuration du logicile OpenADS, il est nécessaire de fournir 2 URLs :
+Pour la configuration du logiciel OpenADS, il est nécessaire de fournir 2 URLs :
 
 * Le lien URL_SIG qui est de la forme **demo.lizmap.com/lizmap**/index.php/view/map/?repository=**rep1**&project=openads
 * Le lien BASE_URL qui est de la forme **demo.lizmap.com/lizmap**/openads.php/service/**rep1**~openads/
@@ -72,4 +73,4 @@ Pour la configuration du logicile OpenADS, il est nécessaire de fournir 2 URLs 
 Vous devez adapter les 2 URLs en fonction :
 
 * de l'URL d'accès à votre instance Lizmap
-* de l'identifiant du répertoire au sein du quel le projet QGIS `openads.qgs` et sa configuration lizmap `openads.qgs.cfg` ont été publiés
+* de l'identifiant du répertoire au sein duquel le projet QGIS `openads.qgs` et sa configuration lizmap `openads.qgs.cfg` ont été publiés
