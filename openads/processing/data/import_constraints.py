@@ -52,6 +52,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
     """
 
     INPUT = "ENTREE"
+    INSEE_FIELD = "CHAMP_INSEE"
     LABEL_FIELD = "CHAMP_ETIQUETTE"
     TEXT_FIELD = "CHAMP_TEXTE"
     GROUP_VALUE = "VALEUR_GROUPE"
@@ -79,6 +80,19 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             [QgsProcessing.TypeVectorPolygon],
         )
         param.setHelp("Couche vecteur qu'il faut importer dans la base de données")
+        self.addParameter(param)
+
+        # noinspection PyArgumentList
+        param = QgsProcessingParameterField(
+            self.INSEE_FIELD,
+            "Champ du code INSEE",
+            parentLayerParameterName=self.INPUT,
+            optional=True,
+        )
+        param.setHelp(
+            "Champ du code INSEE pour la contrainte. Si le champ n'est pas fourni, le code INSEE proviendra "
+            "de l'intersection avec la commune."
+        )
         self.addParameter(param)
 
         # noinspection PyArgumentList
@@ -197,6 +211,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             )
 
         layer = self.parameterAsSource(parameters, self.INPUT, context)
+        insee_field = self.parameterAsString(parameters, self.INSEE_FIELD, context)
         label_field = self.parameterAsString(parameters, self.LABEL_FIELD, context)
         text_field = self.parameterAsString(parameters, self.TEXT_FIELD, context)
         group = self.parameterAsString(parameters, self.GROUP_VALUE, context)
@@ -249,9 +264,28 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
             QgsCoordinateReferenceSystem(f"EPSG:{crs}"),
         )
 
-        layer = self.split_layer_constraints(
-            context, feedback, layer, connection, schema_openads
-        )
+        if not insee_field:
+            feedback.pushInfo(
+                "Le champ code INSEE n'est pas renseigné, l'import des contraintes va donc découper les "
+                "contraintes selon les communes de la couche 'communes' dans le schéma 'openads'."
+            )
+            layer = self.split_layer_constraints(
+                context, feedback, layer, connection, schema_openads
+            )
+            insee_field = "communes_codeinsee"
+            insee_list = None
+        else:
+            feedback.pushInfo(
+                f"Le code INSEE est '{insee_field}' dans la couche {layer.name()}. L'import va utiliser la "
+                f"valeur de ce champ pour l'import."
+            )
+            sql = "SELECT codeinsee FROM openads.communes GROUP BY codeinsee;"
+            result = connection.executeSql(sql)
+            insee_list = [str(f[0]) for f in result]
+            feedback.pushDebugInfo(
+                f"Uniquement les contraintes dont le code INSEE est dans la liste suivante "
+                f"{','.join(insee_list)} vont être importées car ils sont dans la table openads.communes."
+            )
 
         if feedback.isCanceled():
             connection.executeSql("ROLLBACK;")
@@ -261,6 +295,8 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         success = self.import_new_geo_constraints(
             connection,
             feedback,
+            insee_field,
+            insee_list,
             label_field,
             layer,
             schema_openads,
@@ -346,6 +382,8 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         self,
         connection: QgsAbstractDatabaseProviderConnection,
         feedback: QgsProcessingFeedback,
+        insee_field: str,
+        insee_list: list,
         label_field: str,
         layer: QgsVectorLayer,
         schema: str,
@@ -361,11 +399,19 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         for feature in layer.getFeatures():
             content_label = self.clean_value(feature.attribute(label_field))
             content_text = self.clean_value(feature.attribute(text_field))
-            insee_code = self.clean_value(feature.attribute("communes_codeinsee"))
+            insee_code = self.clean_value(feature.attribute(insee_field))
 
             if insee_code == "":
                 feedback.pushDebugInfo(
                     f"Omission de l'entité {feature.id()} car elle n'a pas de code INSEE."
+                )
+                fail += 1
+                continue
+
+            if insee_list and str(insee_code) not in insee_list:
+                feedback.pushDebugInfo(
+                    f"Omission de l'entité {feature.id()} car son code INSEE n'est pas dans la table "
+                    f"openads.communes"
                 )
                 fail += 1
                 continue

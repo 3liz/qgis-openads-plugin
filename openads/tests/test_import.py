@@ -159,6 +159,7 @@ class TestImport(TestCasePlugin):
                 plugin_test_data_path("PLUI", "248000747_INFO_SURF_20201109.shp")
             ),
             "CHAMP_ETIQUETTE": "LIBELLE",
+            # "CHAMP_INSEE": "" let the one from commune layer
             "CHAMP_TEXTE": "TXT",
             "VALEUR_GROUPE": "servitudes",
             "VALEUR_SOUS_GROUPE": "",
@@ -203,6 +204,40 @@ class TestImport(TestCasePlugin):
         # We have municipalities now
         self.assertEqual(results["COUNT_FEATURES"], 71)
         self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 0)
+
+        # INSEE should match the geojson
+        sql = "SELECT codeinsee FROM openads.geo_contraintes GROUP BY codeinsee;"
+        result = connection.executeSql(sql)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], "80016")
+
+        # Empty geo_constraints
+        sql = "TRUNCATE openads.geo_contraintes RESTART IDENTITY;"
+        connection.executeSql(sql)
+
+        params["CHAMP_INSEE"] = "WRONGINSEE"
+        alg = "{}:data_constraints".format(provider.id())
+        results = processing.run(alg, params)
+
+        # 0 because the INSEE code is 80999
+        # The WRONGINSEE column has only INSEE code which are not in the communes.geojson
+        # 80999 versus 800016
+        self.assertEqual(results["COUNT_FEATURES"], 0)
+        self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 0)
+
+        params["CHAMP_INSEE"] = "INSEE"
+        alg = "{}:data_constraints".format(provider.id())
+        results = processing.run(alg, params)
+
+        # 70 because only 70 have a code INSEE = 80016
+        self.assertEqual(results["COUNT_FEATURES"], 70)
+        self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 0)
+
+        # INSEE should match the field 80016
+        sql = "SELECT codeinsee FROM openads.geo_contraintes GROUP BY codeinsee;"
+        result = connection.executeSql(sql)
+        self.assertEqual(len(result), 1)
+        self.assertEqual(result[0][0], "80016")
 
     def test_load_layers_algorithm(self):
         """Test load layers algorithm."""
