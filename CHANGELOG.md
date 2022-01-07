@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+## 0.10.0 - 2022-01-07
+
 * Suppression de la colonne `dossier_importe_geosig` dans la table `dossiers_openads`.
 * Relecture des logs lors de l'import des données contraintes.
 * Ajout d'un paramètre code INSEE dans la couche des contraintes lors de l'import.
