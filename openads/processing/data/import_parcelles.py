@@ -166,7 +166,7 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                 DELETE FROM {schema_openads}.parcelles
                 WHERE ident NOT IN (
                     SELECT p.parcelle
-                    FROM cadastre.parcelle p
+                    FROM {schema_cadastre}.parcelle p
                 )
             """
             try:
