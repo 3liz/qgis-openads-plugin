@@ -1,4 +1,4 @@
-__copyright__ = "Copyright 2021, 3Liz"
+__copyright__ = "Copyright 2022, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
@@ -393,7 +393,6 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
         sub_group: str,
     ) -> int:
         """Import in the database new geo-constraints."""
-        feedback.pushInfo("Insertion des géo-contraintes dans la base de données")
         success = 0
         fail = 0
         for feature in layer.getFeatures():
@@ -423,7 +422,7 @@ class ImportConstraintsAlg(BaseDataAlgorithm):
                 f"{schema}.contraintes "
                 f"WHERE "
                 f"libelle = {QgsExpression.quotedString(content_label)} "
-                f"AND texte = {QgsExpression.quotedString(content_text)}"
+                f"AND texte = {QgsExpression.quotedString(content_text)} "
                 f"AND groupe = {QgsExpression.quotedString(group)} "
                 f"AND sous_groupe = {QgsExpression.quotedString(sub_group)};"
             )

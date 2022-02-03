@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Correction de l'import des contraintes qui pouvait que "toucher" les communes
+
 ## 0.10.0 - 2022-01-07
 
 * Suppression de la colonne `dossier_importe_geosig` dans la table `dossiers_openads`.
