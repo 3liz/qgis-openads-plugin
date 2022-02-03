@@ -1,4 +1,4 @@
-__copyright__ = "Copyright 2021, 3Liz"
+__copyright__ = "Copyright 2022, 3Liz"
 __license__ = "GPL version 3"
 __email__ = "info@3liz.org"
 
@@ -15,12 +15,15 @@ from qgis.core import (
     QgsCoordinateReferenceSystem,
     QgsCoordinateTransform,
     QgsExpression,
+    QgsFeature,
+    QgsGeometry,
     QgsProcessingContext,
     QgsProcessingException,
     QgsProcessingFeedback,
     QgsProject,
     QgsProviderRegistry,
     QgsVectorLayer,
+    edit,
 )
 from qgis.PyQt.QtCore import NULL
 
@@ -238,6 +241,58 @@ class TestImport(TestCasePlugin):
         result = connection.executeSql(sql)
         self.assertEqual(len(result), 1)
         self.assertEqual(result[0][0], "80016")
+
+    def test_touches_parcelles(self):
+        """ Test à propos des communes qui peuvent 'toucher' les contraintes. """
+        # ---------------------------------
+        # |              |                |
+        # | Commune      |  PLUI          |
+        # |              |                |
+        # ---------------------------------
+        # 0              10              20
+        self.connection.executeSql("""
+            INSERT INTO openads.communes (nom, codeinsee, geom)
+            VALUES ('Commune', '11111', ST_Multi(ST_MakeEnvelope(0, 0, 10, 10, 2154)));
+        """)
+
+        layer_to_import = QgsVectorLayer(
+            'MultiPolygon?'
+            'crs=epsg:2154&'
+            'field=id:integer&'
+            'field=libelle:string&'
+            'field=texte:string&'
+            # 'field=insee:11111&'  # Un peu faux car la parcelle est censé être à l'extérieur de la commune
+            'index=yes',
+            'polygon',
+            'memory')
+        self.assertTrue(layer_to_import.isValid())
+
+        # PLUI
+        feature_1 = QgsFeature(layer_to_import.fields())
+        feature_1.setAttribute('id', 1)
+        feature_1.setAttribute('libelle', 'libelle contrainte')
+        feature_1.setAttribute('texte', 'texte contrainte')
+        feature_1.setGeometry(QgsGeometry.fromWkt('MULTIPOLYGON (((10 0, 20 0, 20 10, 10 10)))'))
+
+        with edit(layer_to_import):
+            layer_to_import.addFeature(feature_1)
+
+        params = {
+            "ENTREE": layer_to_import,
+            "CHAMP_ETIQUETTE": "libelle",
+            # "CHAMP_INSEE": "" let the one from commune layer
+            "CHAMP_TEXTE": "texte",
+            "VALEUR_GROUPE": "servitudes",
+            "VALEUR_SOUS_GROUPE": "",
+            "CONNECTION_NAME": os.getenv("TEST_QGIS_CONNEXION_NAME", "test_database"),
+            "SCHEMA_OPENADS": "openads",
+        }
+        provider = ProcessingProvider()
+        alg = "{}:data_constraints".format(provider.id())
+        results = processing.run(alg, params)
+
+        self.assertEqual(results["COUNT_NEW_CONSTRAINTS"], 1)
+        self.assertEqual(results["COUNT_FEATURES"], 0)
 
     def test_load_layers_algorithm(self):
         """Test load layers algorithm."""

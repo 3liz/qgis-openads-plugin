@@ -2,6 +2,8 @@
 
 ## Unreleased
 
+* Correction d'une requête SQL
+
 ## 0.10.0 - 2022-01-07
 
 * Suppression de la colonne `dossier_importe_geosig` dans la table `dossiers_openads`.
