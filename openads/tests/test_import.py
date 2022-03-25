@@ -272,7 +272,7 @@ class TestImport(TestCasePlugin):
         feature_1.setAttribute('id', 1)
         feature_1.setAttribute('libelle', 'libelle contrainte')
         feature_1.setAttribute('texte', 'texte contrainte')
-        feature_1.setGeometry(QgsGeometry.fromWkt('MULTIPOLYGON (((10 0, 20 0, 20 10, 10 10)))'))
+        feature_1.setGeometry(QgsGeometry.fromWkt('MULTIPOLYGON (((10 0, 20 0, 20 10, 10 10, 10 0)))'))
 
         with edit(layer_to_import):
             layer_to_import.addFeature(feature_1)
