@@ -15,9 +15,9 @@ stages:
 QGIS-3.16-PostGIS-2.5:
   stage: Tests 🎳
   image:
-    name: registry.snap.lizlan:5000/qgis/qgis:release-3_16
+    name: $REGISTRY_URI/qgis/qgis:release-3_16
   services:
-    - name: registry.snap.lizlan:5000/postgis:11-2.5
+    - name: $REGISTRY_URI/postgis:11-2.5
       alias: db
   script:
     - mkdir /tests_directory/
@@ -36,9 +36,9 @@ QGIS-3.16-PostGIS-2.5:
 QGIS-Latest-PostGIS-3.0:
   stage: Tests 🎳
   image:
-    name: registry.snap.lizlan:5000/qgis/qgis:latest
+    name: $REGISTRY_URI/qgis/qgis:latest
   services:
-    - name: registry.snap.lizlan:5000/postgis:13-3
+    - name: $REGISTRY_URI/postgis:13-3
       alias: db
   script:
     - mkdir /tests_directory/
