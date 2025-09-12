@@ -145,7 +145,9 @@ class ImportParcellesAlg(BaseDataAlgorithm):
                            p.parcelle AS ident, p.dnvoiri, p.dindic, v.libvoi, v.natvoi
                     FROM {schema_cadastre}.parcelle p
                     JOIN {schema_cadastre}.parcelle_info pi on pi.geo_parcelle = p.parcelle
-                    JOIN {schema_cadastre}.voie v on SUBSTR(pi.voie, 1, 6) || SUBSTR(pi.voie, 12, 4) = SUBSTR(v.voie, 1, 6) || SUBSTR(v.voie, 12, 4)
+                    JOIN {schema_cadastre}.voie v
+                      ON SUBSTR(pi.voie, 1, 6) || SUBSTR(pi.voie, 12, 4) =
+                         SUBSTR(v.voie, 1, 6) || SUBSTR(v.voie, 12, 4)
                 ON CONFLICT (ident) DO UPDATE SET
                     ccocom=EXCLUDED.ccocom, ccodep=EXCLUDED.ccodep,
                     ccodir=EXCLUDED.ccodir, ccopre=EXCLUDED.ccopre,
