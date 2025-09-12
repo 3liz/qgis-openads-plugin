@@ -2,6 +2,9 @@
 
 ## Unreleased
 
+## 0.11.0 - 2025-09-12
+
+* correction de la jointure parcelle_info et voie pour import des parcelles
 * Correction d'une requête SQL
 
 ## 0.10.0 - 2022-01-07
